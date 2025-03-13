@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="py_lib_tests" tests="1" failures="0" errors="0">
+    <testcase name="py_lib_tests" status="run" duration="2" time="2"></testcase>
+      <system-out>
+Generated test.log (if the file is not UTF-8, then this may be unreadable):
+<![CDATA[exec ${PAGER:-/usr/bin/less} "$0" || exit 1
+Executing tests from //:py_lib_tests
+-----------------------------------------------------------------------------
+Former sys.path: ['/bazel_build/tools', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/AD4134', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/AD5522', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/MCP4725', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/MIX_SMU_Lite_CYG', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/bazel_tools', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/cyg_core_driver', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/lynx_core', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/mix_module_base_driver', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/mix_tools', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/mixfw_rules', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/mixrpc', '/usr/lib/python39.zip', '/usr/lib/python3.9', '/usr/lib/python3.9/lib-dynload', '/usr/local/lib/python3.9/dist-packages', '/usr/lib/python3/dist-packages']
+Updated sys.path: ['/bazel_build/tools', '/root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__', 'tmp', '/usr/lib/python39.zip', '/usr/lib/python3.9', '/usr/lib/python3.9/lib-dynload', '/usr/local/lib/python3.9/dist-packages', '/usr/lib/python3/dist-packages']
+============================= test session starts ==============================
+platform linux -- Python 3.9.10, pytest-6.2.5, py-1.10.0, pluggy-1.0.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__/driver/tests, configfile: ../../pytest_py_lib_tests.ini
+plugins: cov-2.12.1, flake8-1.0.7
+collecting ... collected 50 items
+
+driver/tests/test_cyg_hercules_lite_v2.py::FLAKE8 PASSED                 [  2%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_error_condition PASSED   [  4%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_driver_version PASSED [  6%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_reset PASSED             [  8%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_power_on_init PASSED     [ 10%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_single_comp_cap PASSED [ 12%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_single_comp_cap PASSED [ 14%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_single_pmu_mode PASSED [ 16%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_single_pmu_mode PASSED [ 18%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_single_pmu_vol PASSED [ 20%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_single_pmu_vol PASSED [ 22%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_single_pmu_curr_range PASSED [ 24%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_single_pmu_curr_range PASSED [ 26%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_single_pmu_curr PASSED [ 28%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_single_pmu_curr PASSED [ 30%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_single_pmu_clamp_vol PASSED [ 32%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_single_pmu_clamp_vol PASSED [ 34%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_single_pmu_clamp_curr PASSED [ 36%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_single_pmu_clamp_curr PASSED [ 38%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_clear_multi_pmu_alarm PASSED [ 40%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_single_pmu_meas_mode PASSED [ 42%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_single_pmu_meas_mode PASSED [ 44%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_single_pmu_enable PASSED [ 46%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_single_pmu_disable PASSED [ 48%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_multi_pmu_mode PASSED [ 50%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_multi_pmu_curr_range PASSED [ 52%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_multi_pmu_meas_mode PASSED [ 54%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_multi_pmu_enable PASSED  [ 56%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_multi_pmu_disable PASSED [ 58%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_sys_meas_out_gain PASSED [ 60%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_sys_meas_out_gain PASSED [ 62%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_sys_thermal_shutdown_temp PASSED [ 64%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_sys_thermal_shutdown_temp PASSED [ 66%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_read_all_control_reg PASSED [ 68%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_single_meas_result PASSED [ 70%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_multi_meas_result PASSED [ 72%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_register_data PASSED [ 74%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_alarm_status PASSED  [ 76%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_dut_positive_volt PASSED [ 78%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_dut_negative_volt PASSED [ 80%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_get_register_data PASSED [ 82%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_linear_regress PASSED    [ 84%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_write_module_calibration PASSED [ 86%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_sequence_set_single_pmu_vol PASSED [ 88%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_sequence_set_single_pmu_curr PASSED [ 90%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_sequence_disable_single_pmu PASSED [ 92%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_sequence_enable_single_pmu PASSED [ 94%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_control_FV_sequence PASSED [ 96%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_control_FI_sequence PASSED [ 98%]
+driver/tests/test_cyg_hercules_lite_v2.py::test_set_dac_range PASSED     [100%]
+
+=============================== warnings summary ===============================
+test_cyg_hercules_lite_v2.py::test_get_driver_version
+  /usr/local/lib/python3.9/dist-packages/_pytest/unraisableexception.py:78: PytestUnraisableExceptionWarning: Exception ignored in: <function StreamService.__del__ at 0x7fd8e6410670>
+  
+  Traceback (most recent call last):
+    File "mix/rpc/services/streamservice.py", line 183, in __del__
+  AttributeError: 'CYG_HERCULES_LITE_V2' object has no attribute 'streams'
+  
+    warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+- generated xml file: /root/.cache/bazel/_bazel_root/2b932e2db7d64260c064e9d188c6ba9d/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__/junit_pytest.xml -
+======================== 50 passed, 1 warning in 1.69s =========================
+Copy coverage data .coverage.719bdacb8387.3600.826806 for py_lib_test]]>
+      </system-out>
+    </testsuite>
+</testsuites>

@@ -1,0 +1,41 @@
+local_repository(
+    name = "lynx_core",
+    path = "/mix_repos/lynx_core/",
+)
+
+local_repository(
+    name = "mix_module_base_driver",
+    path = "/mix_repos/mix_module_base_driver/",
+)
+
+local_repository(
+    name = "cyg_core_driver",
+    path = "/mix_repos/cyg_core_driver/",
+)
+
+local_repository(
+    name = "mixrpc",
+    path = "/mix_repos/mixrpc/",
+)
+
+
+local_repository(
+    name = "mix_tools",
+    path = "/mix_repos/mix_tools/",
+)
+
+local_repository(
+    name = "MIX_HERCULES_CYG",
+    path = "../SMU/",
+)
+
+local_repository(
+    name = "mixfw_rules",
+    path = "/bazel_build/",
+)
+
+load("@mixfw_rules//:workspace_rules.bzl", "load_common_rules")
+load_common_rules()
+
+load("@mixfw_rules//:dep_rules.bzl", "load_dep_rules")
+load_dep_rules()

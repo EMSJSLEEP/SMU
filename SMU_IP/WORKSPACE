@@ -1,0 +1,16 @@
+local_repository(
+    name = "lynx_core",
+    path = "/mix_repos/lynx_core/",
+)
+
+
+local_repository(
+    name = "mixfw_rules",
+    path = "/bazel_build/",
+)
+
+load("@mixfw_rules//:workspace_rules.bzl", "load_common_rules")
+load_common_rules()
+
+load("@mixfw_rules//:dep_rules.bzl", "load_dep_rules")
+load_dep_rules()

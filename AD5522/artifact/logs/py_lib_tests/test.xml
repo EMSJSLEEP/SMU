@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="py_lib_tests" tests="1" failures="0" errors="0">
+    <testcase name="py_lib_tests" status="run" duration="0" time="0"></testcase>
+      <system-out>
+Generated test.log (if the file is not UTF-8, then this may be unreadable):
+<![CDATA[exec ${PAGER:-/usr/bin/less} "$0" || exit 1
+Executing tests from //:py_lib_tests
+-----------------------------------------------------------------------------
+Former sys.path: ['/bazel_build/tools', '/root/.cache/bazel/_bazel_root/770369f536021c62be29338934676355/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles', '/root/.cache/bazel/_bazel_root/770369f536021c62be29338934676355/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__', '/root/.cache/bazel/_bazel_root/770369f536021c62be29338934676355/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/MIX_HERCULES_CYG', '/root/.cache/bazel/_bazel_root/770369f536021c62be29338934676355/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/bazel_tools', '/root/.cache/bazel/_bazel_root/770369f536021c62be29338934676355/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/cyg_core_driver', '/root/.cache/bazel/_bazel_root/770369f536021c62be29338934676355/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/lynx_core', '/root/.cache/bazel/_bazel_root/770369f536021c62be29338934676355/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/mix_module_base_driver', '/root/.cache/bazel/_bazel_root/770369f536021c62be29338934676355/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/mixfw_rules', '/root/.cache/bazel/_bazel_root/770369f536021c62be29338934676355/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/mixrpc', '/usr/lib/python39.zip', '/usr/lib/python3.9', '/usr/lib/python3.9/lib-dynload', '/usr/local/lib/python3.9/dist-packages', '/usr/lib/python3/dist-packages']
+Updated sys.path: ['/bazel_build/tools', '/root/.cache/bazel/_bazel_root/770369f536021c62be29338934676355/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__', 'tmp', '/usr/lib/python39.zip', '/usr/lib/python3.9', '/usr/lib/python3.9/lib-dynload', '/usr/local/lib/python3.9/dist-packages', '/usr/lib/python3/dist-packages']
+============================= test session starts ==============================
+platform linux -- Python 3.9.10, pytest-6.2.5, py-1.10.0, pluggy-1.0.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /root/.cache/bazel/_bazel_root/770369f536021c62be29338934676355/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__/ic/tests, configfile: ../../pytest_py_lib_tests.ini
+plugins: cov-2.12.1, flake8-1.0.7
+collecting ... collected 27 items
+
+ic/tests/test_ad5522.py::FLAKE8 PASSED                                   [  3%]
+ic/tests/test_ad5522.py::test_read_alarm_reg_back PASSED                 [  7%]
+ic/tests/test_ad5522.py::test_read_pmu_reg_back[16777216] PASSED         [ 11%]
+ic/tests/test_ad5522.py::test_read_pmu_reg_back[33554432] PASSED         [ 14%]
+ic/tests/test_ad5522.py::test_read_pmu_reg_back[67108864] PASSED         [ 18%]
+ic/tests/test_ad5522.py::test_read_pmu_reg_back[134217728] PASSED        [ 22%]
+ic/tests/test_ad5522.py::test_read_dac_reg_x_back PASSED                 [ 25%]
+ic/tests/test_ad5522.py::test_read_dac_reg_m_back PASSED                 [ 29%]
+ic/tests/test_ad5522.py::test_read_dac_reg_c_back PASSED                 [ 33%]
+ic/tests/test_ad5522.py::test_read_sys_reg_back PASSED                   [ 37%]
+ic/tests/test_ad5522.py::test_set_system_control PASSED                  [ 40%]
+ic/tests/test_ad5522.py::test_set_pmu_control PASSED                     [ 44%]
+ic/tests/test_ad5522.py::test_set_clamp_vol PASSED                       [ 48%]
+ic/tests/test_ad5522.py::test_set_clamp_curr PASSED                      [ 51%]
+ic/tests/test_ad5522.py::test_set_output_vol PASSED                      [ 55%]
+ic/tests/test_ad5522.py::test_set_output_curr PASSED                     [ 59%]
+ic/tests/test_ad5522.py::test_set_2_MV PASSED                            [ 62%]
+ic/tests/test_ad5522.py::test_set_2_MI PASSED                            [ 66%]
+ic/tests/test_ad5522.py::test_set_2_FI PASSED                            [ 70%]
+ic/tests/test_ad5522.py::test_set_2_FV PASSED                            [ 74%]
+ic/tests/test_ad5522.py::test_set_dac_offset_value PASSED                [ 77%]
+ic/tests/test_ad5522.py::test_set_current_range PASSED                   [ 81%]
+ic/tests/test_ad5522.py::test_enable_pmu PASSED                          [ 85%]
+ic/tests/test_ad5522.py::test_disable_pmu PASSED                         [ 88%]
+ic/tests/test_ad5522.py::test_sequence_enable_pmu PASSED                 [ 92%]
+ic/tests/test_ad5522.py::test_sequence_disable_pmu PASSED                [ 96%]
+ic/tests/test_ad5522.py::test_disable_chen PASSED                        [100%]
+
+- generated xml file: /root/.cache/bazel/_bazel_root/770369f536021c62be29338934676355/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__/junit_pytest.xml -
+============================== 27 passed in 0.26s ==============================
+Copy coverage data .coverage.719bdacb8387.1323.125335 for py_lib_test]]>
+      </system-out>
+    </testsuite>
+</testsuites>
