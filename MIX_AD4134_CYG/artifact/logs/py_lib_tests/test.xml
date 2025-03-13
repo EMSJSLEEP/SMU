@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="py_lib_tests" tests="1" failures="0" errors="0">
+    <testcase name="py_lib_tests" status="run" duration="1" time="1"></testcase>
+      <system-out>
+Generated test.log (if the file is not UTF-8, then this may be unreadable):
+<![CDATA[exec ${PAGER:-/usr/bin/less} "$0" || exit 1
+Executing tests from //:py_lib_tests
+-----------------------------------------------------------------------------
+Former sys.path: ['/bazel_build/tools', '/root/.cache/bazel/_bazel_root/6c1dadca6a496c6edef3bf878322e620/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles', '/root/.cache/bazel/_bazel_root/6c1dadca6a496c6edef3bf878322e620/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__', '/root/.cache/bazel/_bazel_root/6c1dadca6a496c6edef3bf878322e620/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/bazel_tools', '/root/.cache/bazel/_bazel_root/6c1dadca6a496c6edef3bf878322e620/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/lynx_core', '/root/.cache/bazel/_bazel_root/6c1dadca6a496c6edef3bf878322e620/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/mixfw_rules', '/usr/lib/python39.zip', '/usr/lib/python3.9', '/usr/lib/python3.9/lib-dynload', '/usr/local/lib/python3.9/dist-packages', '/usr/lib/python3/dist-packages']
+Updated sys.path: ['/bazel_build/tools', '/root/.cache/bazel/_bazel_root/6c1dadca6a496c6edef3bf878322e620/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__', 'tmp', '/usr/lib/python39.zip', '/usr/lib/python3.9', '/usr/lib/python3.9/lib-dynload', '/usr/local/lib/python3.9/dist-packages', '/usr/lib/python3/dist-packages']
+============================= test session starts ==============================
+platform linux -- Python 3.9.10, pytest-6.2.5, py-1.10.0, pluggy-1.0.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /root/.cache/bazel/_bazel_root/6c1dadca6a496c6edef3bf878322e620/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__/driver/tests, configfile: ../../pytest_py_lib_tests.ini
+plugins: cov-2.12.1, flake8-1.0.7
+collecting ... collected 23 items
+
+driver/tests/test_mix_ad4134_cyg.py::FLAKE8 PASSED                       [  4%]
+driver/tests/test_mix_ad4134_cyg.py::test_reset PASSED                   [  8%]
+driver/tests/test_mix_ad4134_cyg.py::test_get_reset_status PASSED        [ 13%]
+driver/tests/test_mix_ad4134_cyg.py::test_get_transfer_mode PASSED       [ 17%]
+driver/tests/test_mix_ad4134_cyg.py::test_set_transfer_mode PASSED       [ 21%]
+driver/tests/test_mix_ad4134_cyg.py::test_set_data_frame PASSED          [ 26%]
+driver/tests/test_mix_ad4134_cyg.py::test_get_data_frame_format PASSED   [ 30%]
+driver/tests/test_mix_ad4134_cyg.py::test_set_ip_channel_format PASSED   [ 34%]
+driver/tests/test_mix_ad4134_cyg.py::test_get_channel_format PASSED      [ 39%]
+driver/tests/test_mix_ad4134_cyg.py::test_get_spi_transfer_status PASSED [ 43%]
+driver/tests/test_mix_ad4134_cyg.py::test_spi_write PASSED               [ 47%]
+driver/tests/test_mix_ad4134_cyg.py::test_spi_read PASSED                [ 52%]
+driver/tests/test_mix_ad4134_cyg.py::test_set_channels_dig_filter PASSED [ 56%]
+driver/tests/test_mix_ad4134_cyg.py::test_get_channels_dig_filter PASSED [ 60%]
+driver/tests/test_mix_ad4134_cyg.py::test_set_channels_packet_config PASSED [ 65%]
+driver/tests/test_mix_ad4134_cyg.py::test_get_channels_packet_config PASSED [ 69%]
+driver/tests/test_mix_ad4134_cyg.py::test_set_ad4134_power_mode PASSED   [ 73%]
+driver/tests/test_mix_ad4134_cyg.py::test_set_ad4134_parallel_output PASSED [ 78%]
+driver/tests/test_mix_ad4134_cyg.py::test_set_ad4134_odr PASSED          [ 82%]
+driver/tests/test_mix_ad4134_cyg.py::test_set_measure_count PASSED       [ 86%]
+driver/tests/test_mix_ad4134_cyg.py::test_measure PASSED                 [ 91%]
+driver/tests/test_mix_ad4134_cyg.py::test_axi_read PASSED                [ 95%]
+driver/tests/test_mix_ad4134_cyg.py::test_axi_write PASSED               [100%]
+
+- generated xml file: /root/.cache/bazel/_bazel_root/6c1dadca6a496c6edef3bf878322e620/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__/junit_pytest.xml -
+============================== 23 passed in 0.61s ==============================
+Copy coverage data .coverage.719bdacb8387.2746.767870 for py_lib_test]]>
+      </system-out>
+    </testsuite>
+</testsuites>

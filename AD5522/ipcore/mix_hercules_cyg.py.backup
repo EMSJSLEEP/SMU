@@ -1,0 +1,497 @@
+# -*- coding: utf-8 -*-
+from mix.driver.core.bus.axi4_lite_bus import AXI4LiteBus
+import time
+
+
+class MIXHERCULESIPREGDEF:
+    IP_VER_REG = 0x00
+    IP_TIME_REG = 0x04
+    RESET_REG = 0x10
+    SPI_CHOOSE_REG = 0x14
+    SPI_STATUS_REG = 0x18
+    SPI_WRITE_REG = 0x1C
+    SPI_READ_REG = 0x20
+    READ_BACK_REG = 0x24
+
+    AD7768_CONFIG_REG = 0x28
+    AD7768_CONFIG_MASK = 0x32
+    AD7768_LITE_SWITCH_MASK = 0x10
+    AD7768_STREAM_SWITCH_MASK = 0x20
+    AD7768_CONVERSION_MODE_MASK = 0x8
+    AD7768_CONVERSION_MODE = {'standard': 0, 'oneshot': 1, 0: 'standard', 1: 'oneshot'}
+    AD7768_RESET_MASK = 0x4
+    AD7768_SYNC_MASK = 0x2
+    AD7768_CONTROL_MODE_MASK = 0x1
+    AD7768_CONTROL_MODE = {'pin': 0, 'spi': 1, 0: 'pin', 1: 'spi'}
+
+    AD7768_STATUS_REG = 0x2C
+    AD7768_RESET_STATUS_MASK = 0x200
+    AD7768_AXI_LITE_BUSY_MASK = 0x100
+    AD7768_AXI_STREAM_BUSY_MASK = 0x80
+    AD7768_SPI_BUSY_MASK = 0x40
+    AD7768_RESET_SEND_MASK = 0x4
+    AD7768_SYNC_SEND_MASK = 0x2
+
+    AD7768_SPI_CMD_REG = 0x30
+    AD7768_SPI_RES_REG = 0x34
+    AD7768_ONESHOT_PERIOD_REG = 0x38
+    AD7768_DATA_REG = {0: 0x40, 1: 0x44, 2: 0x48, 3: 0x4C}
+
+    AD7768_LITE_DATA_NUMBER = 0x3C
+
+    AD7768_SPI_ADDR_MASK = 0x7F00
+    AD7768_SPI_DATA_MASK = 0xFF
+
+    AD7768_MAX_DATA_NUMBER = 8192
+    AD7768_CAHNNEL_NUM = 4
+
+    FPGA_WORK_FREQUENCE = 125000000
+
+
+class MIXHERCULESIPREGException(Exception):
+    '''
+    MIXHERCULESIPREGException shows the exception of MIXHERCULESIPREG.
+
+    '''
+
+    def __init__(self, err_str):
+        Exception.__init__(self, '%s.' % (err_str))
+
+
+class MIX_HERCULES_CYG(object):
+    rpc_public_api = ['get_ip_time', 'enable_ad5522_spi', 'get_spi_status', 'ad7768_reset', 'ad5522_spi_write', 
+                      'ad5522_spi_read', 'ad7768_set_control_mode', 'ad7768_get_control_mode', 'ad7768_sync',
+                      'ad7768_spi_write', 'ad7768_spi_read', 'ad7768_set_conversion_mode', 'ad7768_get_conversion_mode']
+
+    def __init__(self, axi4_bus):
+        if isinstance(axi4_bus, str):
+            self.axi4_bus = AXI4LiteBus(axi4_bus, 65536)
+        else:
+            self.axi4_bus = axi4_bus
+
+    def get_ip_time(self):
+        '''
+        Get ip create time.
+
+        Args:
+            None.
+        Return:
+            value, int
+        '''
+        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.IP_TIME_REG, 1)
+        return data[0] & 0x00ffffffff
+
+    def enable_ad5522_spi(self, status):
+        '''
+        Enable ad5522 spi control.
+
+        Args:
+            status: int, [0, 1], 1 means "enable"
+        Return:
+            "done"
+        '''
+        assert status in [0, 1]
+        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.SPI_CHOOSE_REG,
+                                      status)
+        return 'done'
+
+    def get_spi_status(self):
+        '''
+        Get spi write or read status, if it is busy.
+
+        Args:
+            None.
+        Return:
+            [wirte_status, read_status]
+        '''
+        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.SPI_STATUS_REG,
+                                            1)
+        wirte_status = data[0] & 0x01
+        read_status = data[0] & 0x02
+
+        return [wirte_status, read_status]
+
+    def ad5522_spi_write(self, cmd):
+        '''
+        control spi write for ad5522 reg.
+
+        Args:
+            cmd, int.
+        Return:
+            str, "done"
+        '''
+        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.SPI_WRITE_REG, cmd)
+        return 'done'
+
+    def ad5522_spi_read(self, cmd):
+        '''
+        control spi read for ad5522 reg.
+
+        Args:
+            cmd, int
+        Return:
+            reg_data, int
+        '''
+        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.SPI_READ_REG, cmd)
+        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.READ_BACK_REG, 1)
+        return data
+
+    def ad7768_reset(self, timeout=0.01):
+        '''
+        Reset AD7768.
+
+        Args:
+            timeout, double, unit is second(default 0.01s).
+
+        Examples:
+            mix_hercules_cyg.ad7768_reset()
+
+        '''
+        assert timeout > 0, 'timeout value should bigger than 0'
+        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.AD7768_CONFIG_REG, [MIXHERCULESIPREGDEF.AD7768_RESET_MASK])
+        reset_send_flag = False
+        time_start = time.time()
+        while time.time() - time_start < timeout:
+            data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_STATUS_REG, 1)[0]
+            if data & MIXHERCULESIPREGDEF.AD7768_RESET_SEND_MASK != 0:
+                reset_send_flag = True
+            if reset_send_flag and data & MIXHERCULESIPREGDEF.AD7768_RESET_STATUS_MASK == 0:
+                return
+        if reset_send_flag:
+            raise MIXHERCULESIPREGException('time out for ad7768 reseting')
+        else:
+            raise MIXHERCULESIPREGException('time out for sending ad7768 reset signal')
+
+    def ad7768_set_control_mode(self, control_mode):
+        '''
+        Set AD7768's control mode.
+
+        Args:
+            control_mode, string, ['spi', 'pin']
+
+        Examples:
+            mix_hercules_cyg.ad7768_set_control_mode('spi')
+
+        '''
+        assert control_mode in MIXAD7768CYGDef.CONTROL_MODE, 'not supported control mode'
+        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_CONFIG_REG, 1)[0] \
+            & MIXHERCULESIPREGDEF.AD7768_CONFIG_MASK
+        if control_mode == 'spi':
+            data = data | MIXHERCULESIPREGDEF.AD7768_CONTROL_MODE_MASK
+        elif control_mode == 'pin':
+            data = data & ~MIXHERCULESIPREGDEF.AD7768_CONTROL_MODE_MASK
+        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.AD7768_CONFIG_REG, [data])
+
+    def ad7768_get_control_mode(self):
+        '''
+        Get AD7768's current control mode.
+
+        Return, string, ['spi', 'pin']
+
+        Examples:
+            mix_hercules_cyg.ad7768_get_control_mode()
+
+        '''
+        contro_mode = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_CONFIG_REG, 1)[0] \
+            & MIXHERCULESIPREGDEF.AD7768_CONTROL_MODE_MASK
+        return MIXHERCULESIPREGDEF.AD7768_CONTROL_MODE[contro_mode]
+
+    def ad7768_sync(self, timeout=0.01):
+        '''
+        Sync the net setting of AD7768. Every time you make a change to AD7768 should do a sync.
+
+        Args:
+            timeout, double, unit is second(default 0.01s).
+
+        Examples:
+            mix_hercules_cyg.ad7768_sync()
+
+        '''
+        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.AD7768_CONFIG_REG, [MIXHERCULESIPREGDEF.AD7768_SYNC_MASK])
+        time_start = time.time()
+        while time.time() - time_start < timeout:
+            data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_STATUS_REG, 1)[0]
+            if data & MIXHERCULESIPREGDEF.AD7768_SYNC_SEND_MASK != 0:
+                return
+        raise MIXHERCULESIPREGException('time out for sending ad7768 sync signal')
+
+    def ad7768_spi_write(self, addr, data, timeout=0.1):
+        '''
+        Spi write operation for AD7768.
+
+        Args:
+            addr, int, 7bit unsigned value.
+            data, int, 8bit unsigned value.
+            timeout, double, unit is second(default 0.1s).
+
+        Examples:
+            mix_hercules_cyg.ad7768_spi_write(0x0, 0x12)
+
+        '''
+        assert isinstance(addr, int) and addr >= 0, 'invalid register address'
+        assert isinstance(data, int) and data >= 0, 'invalid cmd data'
+        addr = addr & MIXHERCULESIPREGDEF.AD7768_SPI_ADDR_MASK
+        data = data & MIXHERCULESIPREGDEF.AD7768_SPI_DATA_MASK
+        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.AD7768_SPI_CMD_REG, [addr << 8 & data])
+        time_start = time.time()
+        while time.time() - time_start < timeout:
+            spi_busy_status = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_STATUS_REG, 1)[0] \
+                    & MIXHERCULESIPREGDEF.AD7768_SPI_BUSY_MASK
+            if spi_busy_status == 0:
+                return
+        raise MIXHERCULESIPREGException('time out for spi write')
+
+    def ad7768_spi_read(self, addr, timeout=0.1):
+        '''
+        Spi read operation for AD7768.
+
+        Args:
+            addr, int, 7bit unsigned value.
+            timeout, double, unit is second(default 0.1s).
+
+        Examples:
+            mix_hercules_cyg.ad7768_spi_read(0x0)
+
+        '''
+        assert isinstance(addr, int) and addr >= 0, 'invalid register address'
+        addr = addr & MIXHERCULESIPREGDEF.AD7768_SPI_ADDR_MASK
+        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.AD7768_SPI_CMD_REG, [1 << 15 & addr << 8])
+        time_start = time.time()
+        while time.time() - time_start < timeout:
+            spi_busy_status = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_STATUS_REG, 1)[0] \
+                    & MIXHERCULESIPREGDEF.AD7768_SPI_BUSY_MASK
+            if spi_busy_status == 0:
+                data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_SPI_RES_REG, 1)[0] \
+                    & MIXHERCULESIPREGDEF.AD7768_SPI_DATA_MASK
+                return data
+        raise MIXHERCULESIPREGException('time out while spi writing before read')
+
+    def ad7768_set_conversion_mode(self, conversion_mode):
+        '''
+        Set AD7768's data conversion mode.
+
+        Args:
+            conversion_mode, string, ['standard', 'oneshot']
+
+        Examples:
+            mix_hercules_cyg.ad7768_set_conversion_mode('standard')
+
+        '''
+        assert conversion_mode in MIXAD7768CYGDef.CONVERSION_MODE, 'not supported conversion mode'
+        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_CONFIG_REG, 1)[0] \
+            & MIXHERCULESIPREGDEF.AD7768_CONFIG_MASK
+        if conversion_mode == 'standard':
+            data = data & ~MIXHERCULESIPREGDEF.AD7768_CONVERSION_MODE_MASK
+        else:
+            data = data | MIXHERCULESIPREGDEF.AD7768_CONVERSION_MODE_MASK
+        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.AD7768_CONFIG_REG, [data])
+
+    def ad7768_get_conversion_mode(self):
+        '''
+        Get AD7768's current data conversion mode.
+
+        Return, string, ['standard', 'oneshot']
+
+        Examples:
+            mix_hercules_cyg.ad7768_get_conversion_mode()
+
+        '''
+        conversion_mode = (self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_STATUS_REG, 1)[0]
+                           & MIXHERCULESIPREGDEF.AD7768_CONVERSION_MODE_MASK) >> 3
+        return MIXHERCULESIPREGDEF.AD7768_CONVERSION_MODE[conversion_mode]
+
+    def ad7768_set_lite_switch(self, flag):
+        '''
+        Open or close AXI-Lite data transportation.
+
+        Args:
+            flag, string, ['on', 'off']
+
+        Exmaples:
+            mix_hercules_cyg.ad7768_set_lite_switch('on')
+
+        '''
+        assert flag in ['on', 'off'], 'not supported switch flag'
+        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_CONFIG_REG, 1)[0]
+        if flag == 'on':
+            data = data | MIXHERCULESIPREGDEF.AD7768_LITE_SWITCH_MASK
+        else:
+            data = data & ~MIXHERCULESIPREGDEF.AD7768_LITE_SWITCH_MASK
+        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.AD7768_CONFIG_REG, [data])
+
+    def ad7768_get_lite_switch(self):
+        '''
+        Get current AXI-Lite switch status.
+
+        Return: string, ['on', 'off']
+
+        Exmaples:
+            mix_hercules_cyg.ad7768_get_lite_switch()
+
+        '''
+        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_CONFIG_REG, 1)[0]
+        if data & MIXHERCULESIPREGDEF.AD7768_LITE_SWITCH_MASK != 0:
+            return 'on'
+        else:
+            return 'off'
+
+    def ad7768_set_stream_switch(self, flag):
+        '''
+        Open or close AXI-Stream data transportation.
+
+        Args:
+            flag, string, ['on', 'off']
+
+        Exmaples:
+            mix_hercules_cyg.ad7768_set_stream_switch('on')
+
+        '''
+        assert flag in ['on', 'off'], 'not supported switch flag'
+        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_CONFIG_REG, 1)[0]
+        if flag == 'on':
+            data = data | MIXHERCULESIPREGDEF.AD7768_STREAM_SWITCH_MASK
+        else:
+            data = data & ~MIXHERCULESIPREGDEF.AD7768_STREAM_SWITCH_MASK
+        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.AD7768_CONFIG_REG, [data])
+
+    def ad7768_get_stream_switch(self):
+        '''
+        Get current AXI-Stream switch status.
+
+        Return: string, ['on', 'off']
+
+        Exmaples:
+            mix_hercules_cyg.ad7768_get_stream_switch()
+
+        '''
+        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_CONFIG_REG, 1)[0]
+        if data & MIXHERCULESIPREGDEF.AD7768_STREAM_SWITCH_MASK != 0:
+            return 'on'
+        else:
+            return 'off'
+
+    def ad7768_start_lite_transport(self, number):
+        '''
+        Enable this ip to start get adc data and push it to the fifo.
+        You have to ensure that AXI-LITE is on and AD7768 is not busy transporting data(see busy_transport API)
+
+        Args:
+            number, int, 1~AD7768_MAX_DATA_NUMBER
+
+        Examples:
+            mix_hercules_cyg.ad7768_start_lite_transport(5000)
+
+        '''
+        assert isinstance(number, int) and 0 < number and number <= MIXHERCULESIPREGDEF.AD7768_MAX_DATA_NUMBER, \
+            'invalid transporting number'
+        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.AD7768_LITE_DATA_NUMBER, [number])
+
+    def ad7768_busy_lite_transport(self):
+        '''
+        Show if AD7768 is busy transporting data to fifo.
+
+        Return, bool, [True, False]. Return true if AD7768 is busy else false.
+
+        Examples:
+            mix_hercules_cyg.ad7768_busy_lite_transport()
+
+        '''
+        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_STATUS_REG, 1)[0]
+        if data & MIXHERCULESIPREGDEF.AD7768_AXI_LITE_BUSY_MASK != 0:
+            return True
+        else:
+            return False
+
+    def ad7768_busy_stream_transport(self):
+        '''
+        Show if AD7768 is busy transporting data to fifo.
+
+        Return, bool, [True, False]. Return true if AD7768 is busy else false.
+
+        Examples:
+            mix_hercules_cyg.ad7768_busy_stream_transport()
+
+        '''
+        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.AD7768_STATUS_REG, 1)[0]
+        if data & MIXHERCULESIPREGDEF.AD7768_AXI_STREAM_BUSY_MASK != 0:
+            return True
+        else:
+            return False
+
+    def ad7768_measure_one(self, data_number, channel_index, channel_number, timeout):
+        '''
+        Start a measure on one channel.
+
+        Args:
+            data_number, int. The sampling data number you want to get from AD7768.
+            channel_index, int. The channel's index which you want to measure from.
+            channel_number, int. The total channel number of AD7768 or AD7768-4.
+            timeout, float.
+
+        Return:
+            list, [0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, ...]
+
+        Examples:
+            mix_hercules_cyg.ad7768_measure_one(4800, 0, 4)
+
+        '''
+        assert channel_number in MIXAD7768CYGDef.CHANNEL_NUM, 'invalid channel number'
+        assert isinstance(channel_index, int) and 0 <= channel_index and channel_index < channel_number, \
+            'invalid channel index'
+        if self.ad7768_get_lite_switch() == 'off':
+            self.ad7768_set_lite_switch('on')
+        self.ad7768_start_lite_transport(data_number)
+        time_start = time.time()
+        while time.time() - time_start < timeout:
+            if self.ad7768_busy_lite_transport() is False:
+                measure_result = self.axi4_bus.read_32bit_fix(
+                    MIXHERCULESIPREGDEF.AD7768_DATA_REG[channel_index], data_number)
+                return measure_result
+        self.ad7768_set_lite_switch('off')
+        raise MIXHERCULESIPREGException('time out while measuring')
+
+    def ad7768_measure_all(self, data_number, channel_number, timeout):
+        '''
+        Start a measure on all channels.
+
+        Args:
+            number, int. The sampling data number you want to get from AD7768.
+            channel_number, int. The total channel number of AD7768 or AD7768-4.
+            timeout, float.
+
+        Return:
+            dict, {0: [0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, ...], 1: [0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, ...], ...}
+
+        Examples:
+            mix_hercules_cyg.ad7768_measure_all(4800, 4)
+
+        '''
+        assert channel_number in MIXAD7768CYGDef.CHANNEL_NUM, 'invalid channel number'
+        if self.ad7768_get_lite_switch() == 'off':
+            self.ad7768_set_lite_switch('on')
+        self.ad7768_start_lite_transport(data_number)
+        measure_result = dict()
+        time_start = time.time()
+        while time.time() - time_start < timeout:
+            if self.ad7768_busy_lite_transport() is False:
+                for channel_index in range(channel_number):
+                    measure_result[channel_index] = self.axi4_bus.read_32bit_fix(
+                        MIXHERCULESIPREGDEF.AD7768_DATA_REG[channel_index], data_number)
+                return measure_result
+        self.ad7768_set_lite_switch('off')
+        raise MIXHERCULESIPREGException('time out while measuring')
+
+    def ad7768_set_oneshot_frequence(self, freq):
+        '''
+        Set the sampling frequence in one shot mode.
+
+        Args:
+            freq, float, unit: Hz
+
+        Examples:
+            mix_hercules_cyg.ad7768_set_oneshot_frequence(1000)
+
+        '''
+        assert 0 < freq, 'invalid one shot sampling frequence'
+        period = round(MIXHERCULESIPREGDEF.FPGA_WORK_FREQUENCE / freq)
+        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.AD7768_ONESHOT_PERIOD_REG, [period])

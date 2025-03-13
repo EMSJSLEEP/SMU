@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="py_lib_tests" tests="1" failures="0" errors="0">
+    <testcase name="py_lib_tests" status="run" duration="0" time="0"></testcase>
+      <system-out>
+Generated test.log (if the file is not UTF-8, then this may be unreadable):
+<![CDATA[exec ${PAGER:-/usr/bin/less} "$0" || exit 1
+Executing tests from //:py_lib_tests
+-----------------------------------------------------------------------------
+Former sys.path: ['/bazel_build/tools', '/root/.cache/bazel/_bazel_root/dbec51d3d0b59127ebb6ab0d985b9edc/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles', '/root/.cache/bazel/_bazel_root/dbec51d3d0b59127ebb6ab0d985b9edc/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__', '/root/.cache/bazel/_bazel_root/dbec51d3d0b59127ebb6ab0d985b9edc/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/bazel_tools', '/root/.cache/bazel/_bazel_root/dbec51d3d0b59127ebb6ab0d985b9edc/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/lynx_core', '/root/.cache/bazel/_bazel_root/dbec51d3d0b59127ebb6ab0d985b9edc/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/mixfw_rules', '/usr/lib/python39.zip', '/usr/lib/python3.9', '/usr/lib/python3.9/lib-dynload', '/usr/local/lib/python3.9/dist-packages', '/usr/lib/python3/dist-packages']
+Updated sys.path: ['/bazel_build/tools', '/root/.cache/bazel/_bazel_root/dbec51d3d0b59127ebb6ab0d985b9edc/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__', 'tmp', '/usr/lib/python39.zip', '/usr/lib/python3.9', '/usr/lib/python3.9/lib-dynload', '/usr/local/lib/python3.9/dist-packages', '/usr/lib/python3/dist-packages']
+============================= test session starts ==============================
+platform linux -- Python 3.9.10, pytest-6.2.5, py-1.10.0, pluggy-1.0.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /root/.cache/bazel/_bazel_root/dbec51d3d0b59127ebb6ab0d985b9edc/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__/driver/tests, configfile: ../../pytest_py_lib_tests.ini
+plugins: cov-2.12.1, flake8-1.0.7
+collecting ... collected 13 items
+
+driver/tests/test_mix_smu_lite_cyg.py::FLAKE8 PASSED                     [  7%]
+driver/tests/test_mix_smu_lite_cyg.py::test_get_ip_time PASSED           [ 15%]
+driver/tests/test_mix_smu_lite_cyg.py::test_reset PASSED                 [ 23%]
+driver/tests/test_mix_smu_lite_cyg.py::test_enable_choose_spi PASSED     [ 30%]
+driver/tests/test_mix_smu_lite_cyg.py::test_reset_ad5522 PASSED          [ 38%]
+driver/tests/test_mix_smu_lite_cyg.py::test_set_ADA4870_pin PASSED       [ 46%]
+driver/tests/test_mix_smu_lite_cyg.py::test_set_LOAD_pin PASSED          [ 53%]
+driver/tests/test_mix_smu_lite_cyg.py::test_get_spi_status PASSED        [ 61%]
+driver/tests/test_mix_smu_lite_cyg.py::test_ad5522_spi_write PASSED      [ 69%]
+driver/tests/test_mix_smu_lite_cyg.py::test_ad5522_spi_read PASSED       [ 76%]
+driver/tests/test_mix_smu_lite_cyg.py::test_enable_cmd_list_send PASSED  [ 84%]
+driver/tests/test_mix_smu_lite_cyg.py::test_get_cmd_list_send_status PASSED [ 92%]
+driver/tests/test_mix_smu_lite_cyg.py::test_write_cmd_list PASSED        [100%]
+
+- generated xml file: /root/.cache/bazel/_bazel_root/dbec51d3d0b59127ebb6ab0d985b9edc/execroot/__main__/bazel-out/k8-fastbuild/bin/py_lib_tests.runfiles/__main__/junit_pytest.xml -
+============================== 13 passed in 0.20s ==============================
+Copy coverage data .coverage.719bdacb8387.499.621869 for py_lib_test]]>
+      </system-out>
+    </testsuite>
+</testsuites>
