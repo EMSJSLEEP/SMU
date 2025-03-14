@@ -6,7 +6,7 @@ __author__ = 'daining.chen@cygia.com'
 __version__ = '0.1'
 
 
-class MIXHERCULESIPREGDEF:
+class MIXHERMESIPREGDEF:
     IP_VER_REG = 0x00
     IP_TIME_REG = 0x04
     RESET_REG = 0x10
@@ -20,17 +20,7 @@ class MIXHERCULESIPREGDEF:
     CMD_STORE_LOAD_REG = 0x5C
     CMD_TIME_CONTROL = 0x60
 
-class MIXHERCULESIPREGException(Exception):
-    '''
-    MIXHERCULESIPREGException shows the exception of MIXHERCULESIPREG.
-
-    '''
-
-    def __init__(self, err_str):
-        Exception.__init__(self, '%s.' % (err_str))
-
-
-class MIX_SMU_Lite_CYG(object):
+class MIX_HERMES_CYG(object):
     rpc_public_api = [
         'get_ip_time', 'enable_choose_spi', 'get_spi_status',
         'ad5522_spi_write', 'ad5522_spi_read', 'enable_cmd_list_send',
@@ -52,7 +42,7 @@ class MIX_SMU_Lite_CYG(object):
         Return:
             value, string
         '''
-        date = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.IP_TIME_REG,
+        date = self.axi4_bus.read_32bit_fix(MIXHERMESIPREGDEF.IP_TIME_REG,
                                             1)[0]
         date = hex(date)[2:]
         return date
@@ -65,7 +55,7 @@ class MIX_SMU_Lite_CYG(object):
         Return:
             str, "done"
         '''
-        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.RESET_REG, [3])
+        self.axi4_bus.write_32bit_fix(MIXHERMESIPREGDEF.RESET_REG, [3])
         self.reset_ad5522()
         return "done"
 
@@ -80,11 +70,11 @@ class MIX_SMU_Lite_CYG(object):
             "done"
         '''
         assert status in [0, 1]
-        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.SPI_CHOOSE_REG,
+        data = self.axi4_bus.read_32bit_fix(MIXHERMESIPREGDEF.SPI_CHOOSE_REG,
                                             1)[0]
         data &= ~(1 << 0 | 1 << 1)
         data |= status
-        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.SPI_CHOOSE_REG,
+        self.axi4_bus.write_32bit_fix(MIXHERMESIPREGDEF.SPI_CHOOSE_REG,
                                       [data])
         return 'done'
 
@@ -96,10 +86,10 @@ class MIX_SMU_Lite_CYG(object):
         Return:
             str, "done"
         '''
-        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.SPI_CHOOSE_REG, 1)[0]
+        data = self.axi4_bus.read_32bit_fix(MIXHERMESIPREGDEF.SPI_CHOOSE_REG, 1)[0]
         data &= ~(1 << 3 | 1 << 1)
         data |= status << 3
-        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.SPI_CHOOSE_REG, [data])
+        self.axi4_bus.write_32bit_fix(MIXHERMESIPREGDEF.SPI_CHOOSE_REG, [data])
         return "done"
 
     def reset_ad5522(self):
@@ -107,7 +97,7 @@ class MIX_SMU_Lite_CYG(object):
         reset ad5522
         '''
         reg = 0x1f
-        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.SPI_CHOOSE_REG,
+        self.axi4_bus.write_32bit_fix(MIXHERMESIPREGDEF.SPI_CHOOSE_REG,
                                       [reg])
         return "done"
 
@@ -119,11 +109,11 @@ class MIX_SMU_Lite_CYG(object):
         Return:
             str, "done"
         '''
-        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.SPI_CHOOSE_REG,
+        data = self.axi4_bus.read_32bit_fix(MIXHERMESIPREGDEF.SPI_CHOOSE_REG,
                                             1)[0]
         data &= ~(1 << 4 | 1 << 1)
         data |= status << 4
-        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.SPI_CHOOSE_REG,
+        self.axi4_bus.write_32bit_fix(MIXHERMESIPREGDEF.SPI_CHOOSE_REG,
                                       [data])
         return "done"
 
@@ -136,7 +126,7 @@ class MIX_SMU_Lite_CYG(object):
         Return:
             [wirte_status, read_status]
         '''
-        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.SPI_STATUS_REG,
+        data = self.axi4_bus.read_32bit_fix(MIXHERMESIPREGDEF.SPI_STATUS_REG,
                                             1)[0]
         wirte_status = data & 0x01
         read_status = (data & 0x02) >> 1
@@ -152,7 +142,7 @@ class MIX_SMU_Lite_CYG(object):
         Return:
             str, "done"
         '''
-        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.SPI_WRITE_REG, [cmd])
+        self.axi4_bus.write_32bit_fix(MIXHERMESIPREGDEF.SPI_WRITE_REG, [cmd])
         return 'done'
 
     def ad5522_spi_read(self, cmd):
@@ -164,8 +154,8 @@ class MIX_SMU_Lite_CYG(object):
         Return:
             reg_data, int
         '''
-        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.SPI_READ_REG, [cmd])
-        data = self.axi4_bus.read_32bit_fix(MIXHERCULESIPREGDEF.READ_BACK_REG,
+        self.axi4_bus.write_32bit_fix(MIXHERMESIPREGDEF.SPI_READ_REG, [cmd])
+        data = self.axi4_bus.read_32bit_fix(MIXHERMESIPREGDEF.READ_BACK_REG,
                                             1)[0]
         return data
 
@@ -180,7 +170,7 @@ class MIX_SMU_Lite_CYG(object):
         '''
         cmd = 0x01 | is_loop << 1
         self.axi4_bus.write_32bit_fix(
-            MIXHERCULESIPREGDEF.ENABLE_CMD_LIST_SEND_REG, [cmd])
+            MIXHERMESIPREGDEF.ENABLE_CMD_LIST_SEND_REG, [cmd])
         return "done"
 
     def enable_loop_func(self, is_loop):
@@ -194,7 +184,7 @@ class MIX_SMU_Lite_CYG(object):
         '''
         cmd = 0x00 | int(is_loop) << 1
         self.axi4_bus.write_32bit_fix(
-            MIXHERCULESIPREGDEF.ENABLE_CMD_LIST_SEND_REG, [cmd])
+            MIXHERMESIPREGDEF.ENABLE_CMD_LIST_SEND_REG, [cmd])
         return "done"
 
     def get_cmd_list_send_status(self):
@@ -208,7 +198,7 @@ class MIX_SMU_Lite_CYG(object):
         
         '''
         data = self.axi4_bus.read_32bit_fix(
-            MIXHERCULESIPREGDEF.CMD_LIST_STATUS_REG, 1)[0]
+            MIXHERMESIPREGDEF.CMD_LIST_STATUS_REG, 1)[0]
         return data
     
     def write_cmd_list(self, cmd, if_load, delay_time):
@@ -224,6 +214,6 @@ class MIX_SMU_Lite_CYG(object):
         '''
         cmd_list_reg = cmd | (if_load << 31)
         cmd_delay_reg = delay_time
-        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.CMD_STORE_LOAD_REG, [cmd_list_reg])
-        self.axi4_bus.write_32bit_fix(MIXHERCULESIPREGDEF.CMD_TIME_CONTROL, [cmd_delay_reg])
+        self.axi4_bus.write_32bit_fix(MIXHERMESIPREGDEF.CMD_STORE_LOAD_REG, [cmd_list_reg])
+        self.axi4_bus.write_32bit_fix(MIXHERMESIPREGDEF.CMD_TIME_CONTROL, [cmd_delay_reg])
         return 'done'         
