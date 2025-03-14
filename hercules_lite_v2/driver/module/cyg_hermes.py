@@ -261,20 +261,29 @@ class CYGHERMESDef:
         },
         'MV_CH1': {
             'cali_segment': [{
+                'threshold': 0.0,
+                'limit': (-10000, 0.0)
+            },{
                 'threshold': 10000.0,
-                'limit': (-10000.0, 10000.0)
+                'limit': (0, 10000.0)
             }]
         },
         'MV_CH2': {
             'cali_segment': [{
+                'threshold': 0.0,
+                'limit': (-10000, 0.0)
+            },{
                 'threshold': 10000.0,
-                'limit': (-10000.0, 10000.0)
+                'limit': (0, 10000.0)
             }]
         },
         'MV_CH3': {
             'cali_segment': [{
+                'threshold': 0.0,
+                'limit': (-10000, 0.0)
+            },{
                 'threshold': 10000.0,
-                'limit': (-10000.0, 10000.0)
+                'limit': (0, 10000.0)
             }]
         },
         'MI_CH0_5uA': {
@@ -939,7 +948,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         self.ad4134.set_ip_channel_format(2)
         self.ad4134.set_channels_packet_config(2, 0, 1, 0)
         self.ad4134.set_channels_dig_filter([2, 2, 2, 2])
-        self.ad4134.set_ad4134_power_mode("slow")
+        self.ad4134.set_ad4134_power_mode("fast")
         self.ad4134.set_transfer_mode('all')
         self.ad4134.set_ad4134_parallel_output()
         time.sleep(0.2)
