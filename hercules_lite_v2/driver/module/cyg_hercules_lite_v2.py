@@ -1,4 +1,4 @@
-from mix.driver.core.ic.cat24cxx import CAT24C64
+from mix.driver.core.ic.cat24cxx import CAT24C64, CAT24C32
 from mix.driver.cyg.common.ic.ad5522 import AD5522, AD5522RegDef
 from mix.driver.cyg.common.ic.mcp4725 import MCP4725
 from mix.driver.cyg.common.ipcore.mix_ad4134_cyg import MIXAD4134CYG
@@ -12,13 +12,13 @@ import time
 
 __version__ = '0.3'
 
-
 class CYGHERCULESLITEDef:
     LOW_LIMIT_VOL=-1250
     DMA_MAX_READ_SIZE = 16
     DMA_TIME_OUT = 1
     BASE_CLOCK_TIME = 1.0 / 125e6
     EEPROM_DEV_ADDR = 0x20
+    EEPROM_AMP_DEV_ADDR = 0x21
     P_DAC_POWER_ADDR = 0x60
     N_DAC_POWER_ADDR = 0x61
     IO_EXPEND_ADDR = 0x22
@@ -846,6 +846,8 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         if i2c_eeprom and i2c_dac_and_io:
             self.eeprom = CAT24C64(i2c_eeprom,
                                    CYGHERCULESLITEDef.EEPROM_DEV_ADDR)
+            self.eeprom_amp = CAT24C32(i2c_eeprom,
+                                   CYGHERCULESLITEDef.EEPROM_AMP_DEV_ADDR)
             self.cat9555 = CAT9555(i2c_dac_and_io,
                                    CYGHERCULESLITEDef.IO_EXPEND_ADDR)
             self.mcp4725_P = MCP4725(i2c_dac_and_io,
@@ -866,7 +868,14 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         self.dma = dma
         StreamServiceBuffered.__init__(self, CYGHERCULESLITEDef.DMA_MAX_READ_SIZE,
                                        CYGHERCULESLITEDef.DMA_TIME_OUT)
-
+        try:
+            bottom_sn_list = None
+            bottom_sn_list = self.eeprom_amp.read(0, 16)
+            if bottom_sn_list != None:
+                raise CYGHERCULESLITEException("This hercules is a single board, Do not use bottom board.")
+        except Exception as e:
+            print("Can be ignore error {e}")
+        
         self.select_range = ["2mA", "2mA", "2mA", "2mA"]
         self.ip_control = MIX_SMU_Lite_CYG(self.axi4_bus)
         self.ad5522 = AD5522(self.ip_control, 5000)
@@ -957,7 +966,7 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         self.ad4134.set_ip_channel_format(2)
         self.ad4134.set_channels_packet_config(2, 0, 1, 0)
         self.ad4134.set_channels_dig_filter([2, 2, 2, 2])
-        self.ad4134.set_ad4134_power_mode("fast")
+        self.ad4134.set_ad4134_power_mode("slow")
         self.ad4134.set_transfer_mode('all')
         self.ad4134.set_ad4134_parallel_output()
         time.sleep(0.2)
