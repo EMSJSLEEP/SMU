@@ -247,20 +247,29 @@ class CYGHERCULESLITEDef:
         },
         'MV_CH1': {
             'cali_segment': [{
+                'threshold': 0.0,
+                'limit': (-10000, 0.0)
+            },{
                 'threshold': 10000.0,
-                'limit': (-10000.0, 10000.0)
+                'limit': (0, 10000.0)
             }]
         },
         'MV_CH2': {
             'cali_segment': [{
+                'threshold': 0.0,
+                'limit': (-10000, 0.0)
+            },{
                 'threshold': 10000.0,
-                'limit': (-10000.0, 10000.0)
+                'limit': (0, 10000.0)
             }]
         },
         'MV_CH3': {
             'cali_segment': [{
+                'threshold': 0.0,
+                'limit': (-10000, 0.0)
+            },{
                 'threshold': 10000.0,
-                'limit': (-10000.0, 10000.0)
+                'limit': (0, 10000.0)
             }]
         },
         'MI_CH0_5uA': {
