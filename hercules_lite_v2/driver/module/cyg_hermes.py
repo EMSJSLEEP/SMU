@@ -27,7 +27,7 @@ class CYGHERMESDef:
     CAT9555_COMP_BANK = 1
     FV_MODE = 0x00
     FI_MODE = 0x01
-    PMU_REG_DEFAULT = 1 << 6 | 0xF << 13
+    PMU_REG_DEFAULT = 1 << 6 | 0xF << 13 | 1 << 20
     OVERLOAD_COFFI = 1.125
     OUTPUT_RANGE_ADDRESS = 0x1ffc
     AD5522_CHANNEL = {
