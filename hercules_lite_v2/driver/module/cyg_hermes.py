@@ -791,7 +791,7 @@ cyg_hercules_range_table = {
     "MI_CH3_2mA": 46,
     "MI_CH3_external": 47}
 
-class CYGHERCULESLITEException(Exception):
+class CYGHERMESException(Exception):
     def __init__(self, err_str):
         Exception.__init__(self, '%s.' % (err_str))
 
@@ -851,7 +851,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         hermes_sn_in_bottom = self.eeprom_amp.read(17, 16)
         ascii_str = ''.join(chr(i) for i in hermes_sn_in_bottom)
         if self.read_serial_number() !=  ascii_str:
-            raise CYGHERCULESLITEException("Please check whether the baseplate and hercules are compatible")
+            raise CYGHERMESException("Please check whether the baseplate and hercules are compatible")
         self.select_range = ["2mA", "2mA", "2mA", "2mA"]
         self.ip_control = MIX_SMU_Lite_CYG(self.axi4_bus)
         self.ad5522 = AD5522(self.ip_control, 5000)
@@ -1024,7 +1024,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             self.ad5522.set_2_FI([CYGHERMESDef.AD5522_CHANNEL[channel]])
 
         else:
-            raise CYGHERCULESLITEException("wrong param for mode")
+            raise CYGHERMESException("wrong param for mode")
         return "done"
 
     def get_single_pmu_mode(self, channel):
@@ -1051,7 +1051,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         elif mode_bit == CYGHERMESDef.FI_MODE:
             return "FI"
         else:
-            raise CYGHERCULESLITEException("wrong mode get")
+            raise CYGHERMESException("wrong mode get")
 
     def set_single_pmu_vol(self, channel, vol):
         '''
@@ -1358,7 +1358,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             self.ad5522.set_2_FI(
                 [CYGHERMESDef.AD5522_CHANNEL[ch] for ch in channel])
         else:
-            raise CYGHERCULESLITEException("wrong param for mode")
+            raise CYGHERMESException("wrong param for mode")
         return "done"
 
     def set_multi_pmu_curr_range(self, channel, curr_range):
@@ -1643,7 +1643,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             self.ad5522.set_output_vol(
                 CYGHERMESDef.AD5522_CHANNEL[channel], reg_data)
         else:
-            raise CYGHERCULESLITEException("error param for reg_type")
+            raise CYGHERMESException("error param for reg_type")
         return "done"
 
     def get_alarm_status(self):
@@ -2018,7 +2018,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         if (self.ip_control.get_cmd_list_send_status() == 0):
             self.ip_control.enable_cmd_list_send(is_loop)
         else:
-            raise CYGHERCULESLITEException("Please wait for while")
+            raise CYGHERMESException("Please wait for while")
         return "done"
 
     def control_FI_sequence(self, channel_list, curr_list, continue_time_list,
@@ -2057,7 +2057,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         if (self.ip_control.get_cmd_list_send_status() == 0):
             self.ip_control.enable_cmd_list_send(is_loop)
         else:
-            raise CYGHERCULESLITEException("Please wait for while")
+            raise CYGHERMESException("Please wait for while")
         return "done"
 
     def set_dac_range(self, low_vol=None):
