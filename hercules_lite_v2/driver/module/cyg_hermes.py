@@ -846,12 +846,6 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         self.dma = dma
         StreamServiceBuffered.__init__(self, CYGHERMESDef.DMA_MAX_READ_SIZE,
                                        CYGHERMESDef.DMA_TIME_OUT)
-        
-        hermes_sn_in_bottom = self.eeprom_amp.read(17, 16)
-        ascii_str = ''.join(chr(i) for i in hermes_sn_in_bottom)
-        hermes_sn = self.read_serial_number()
-        if hermes_sn != ascii_str:
-            raise CYGHERMESException(f"Please check whether the baseplate and hercules are compatible")
         self.select_range = ["2mA", "2mA", "2mA", "2mA"]
         self.ip_control = MIX_SMU_Lite_CYG(self.axi4_bus)
         self.ad5522 = AD5522(self.ip_control, 5000)
@@ -866,7 +860,12 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             self.cal_table = cyg_hercules_range_table
         super(CYG_HERMES, self).__init__(self.eeprom,
                                     temperature_device=None,
-                                    channel_table=self.cal_table) 
+                                    channel_table=self.cal_table)
+        hermes_sn_in_bottom = self.eeprom_amp.read(17, 17)
+        ascii_str = ''.join(chr(i) for i in hermes_sn_in_bottom)
+        hermes_sn = self.read_serial_number()
+        if hermes_sn != ascii_str:
+            raise CYGHERMESException(f"Please check whether the baseplate and hercules are compatible")
         self.load_calibration()
         self.reset()
     
