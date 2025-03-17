@@ -6,7 +6,7 @@ from mix.driver.core.bus.axi4_lite_bus import AXI4LiteBus
 from mix.driver.cyg.common.module.cyg_module_driver import CYGModuleDriver, CalCell
 from mix.driver.core.ic.cat9555 import CAT9555
 from mix.rpc.services.streamservice import StreamServiceBuffered, StreamFilter
-from mix.driver.cyg.common.ipcore.mix_smu_pro_cyg import MIX_HERMES_CYG
+from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
@@ -853,7 +853,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         if self.read_serial_number() !=  ascii_str:
             raise CYGHERCULESLITEException("Please check whether the baseplate and hercules are compatible")
         self.select_range = ["2mA", "2mA", "2mA", "2mA"]
-        self.ip_control = MIX_HERMES_CYG(self.axi4_bus)
+        self.ip_control = MIX_SMU_Lite_CYG(self.axi4_bus)
         self.ad5522 = AD5522(self.ip_control, 5000)
         self.ad4134 = MIXAD4134CYG(self.axi4_bus)
         volt_range = self.set_dac_range()
