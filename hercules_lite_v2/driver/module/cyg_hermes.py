@@ -10,8 +10,7 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.3'
-
+__version__ = '0.1'
 
 class CYGHERMESDef:
     LOW_LIMIT_VOL=-1250
@@ -850,8 +849,9 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         
         hermes_sn_in_bottom = self.eeprom_amp.read(17, 16)
         ascii_str = ''.join(chr(i) for i in hermes_sn_in_bottom)
-        if self.read_serial_number() !=  ascii_str:
-            raise CYGHERMESException("Please check whether the baseplate and hercules are compatible")
+        hermes_sn = self.read_serial_number()
+        if hermes_sn != ascii_str:
+            raise CYGHERMESException(f"Please check whether the baseplate and hercules are compatible")
         self.select_range = ["2mA", "2mA", "2mA", "2mA"]
         self.ip_control = MIX_SMU_Lite_CYG(self.axi4_bus)
         self.ad5522 = AD5522(self.ip_control, 5000)
@@ -864,8 +864,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             self.cal_table = cyg_hercules_range_table
         else:
             self.cal_table = cyg_hercules_range_table
-        super(CYG_HERMES,
-                    self).__init__(self.eeprom,
+        super(CYG_HERMES, self).__init__(self.eeprom,
                                     temperature_device=None,
                                     channel_table=self.cal_table) 
         self.load_calibration()
@@ -2259,13 +2258,3 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         pin_num = int(channel[2:]) + 4
         self.cat9555_amp.set_pin_val(pin_num, status)
         return "done"
-
-
-
-
-
-
-
-
-
-
