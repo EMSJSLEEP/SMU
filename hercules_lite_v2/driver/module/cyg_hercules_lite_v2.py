@@ -10,7 +10,7 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.3'
+__version__ = '0.4'
 
 class CYGHERCULESLITEDef:
     LOW_LIMIT_VOL=-1250
@@ -26,7 +26,7 @@ class CYGHERCULESLITEDef:
     CAT9555_COMP_BANK = 1
     FV_MODE = 0x00
     FI_MODE = 0x01
-    PMU_REG_DEFAULT = 1 << 6 | 0xF << 13
+    PMU_REG_DEFAULT = 1 << 6 | 0xF << 13 | 1 << 20
     OVERLOAD_COFFI = 1.125
     OUTPUT_RANGE_ADDRESS = 0x1ffc
     AD5522_CHANNEL = {
@@ -965,6 +965,7 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         self.ad5522.set_system_control(cmd_sys)
         self.ad5522.set_dac_offset_value(int(self.base_dac_offset))
         self.update_dac_and_pmu_reg()
+        self.set_calibration_mode("cal")
         return "done"
 
     def reset_ad4134(self):
