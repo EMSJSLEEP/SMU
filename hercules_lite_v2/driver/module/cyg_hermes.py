@@ -1116,10 +1116,6 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
         assert curr_range in CYGHERMESDef.CURREMT_RANGE.keys()
         self.select_ad_spi(1)
-        if curr_range == "external":
-            self.set_power_amp_board_relay(channel, 0)
-        else:
-            self.set_power_amp_board_relay(channel, 1)
         self.ad5522.set_current_range(
             [CYGHERMESDef.AD5522_CHANNEL[channel]],
             CYGHERMESDef.CURREMT_RANGE[curr_range])
@@ -1306,6 +1302,12 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
                                   status_bit)
         self.ad5522.enable_pmu([CYGHERMESDef.AD5522_CHANNEL[channel]])
 
+        channel_curr_range = self.get_single_pmu_curr_range(channel)
+        
+        if channel_curr_range == "external":
+            self.set_power_amp_board_relay(channel, 0)
+        else:
+            self.set_power_amp_board_relay(channel, 1)
         return "done"
 
     def single_pmu_disable(self, channel):
