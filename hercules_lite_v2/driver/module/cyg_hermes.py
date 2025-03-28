@@ -1301,10 +1301,8 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK,
                                   status_bit)
         self.ad5522.enable_pmu([CYGHERMESDef.AD5522_CHANNEL[channel]])
-
-        channel_curr_range = self.get_single_pmu_curr_range(channel)
-        
-        if channel_curr_range == "external":
+        curr_range = self.get_single_pmu_curr_range(channel)
+        if curr_range == "external":
             self.set_power_amp_board_relay(channel, 0)
         else:
             self.set_power_amp_board_relay(channel, 1)
@@ -2114,6 +2112,11 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         status_bit |= 1 << int(channel[2:])
         self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK,
                                   status_bit)
+        curr_range = self.get_single_pmu_curr_range(channel)
+        if curr_range == "external":
+            self.set_power_amp_board_relay(channel, 0)
+        else:
+            self.set_power_amp_board_relay(channel, 1)
 
         return "done"
 
