@@ -299,11 +299,14 @@ class CYGHERMESDef:
         },
         'MI_CH0_200uA': {
             'cali_segment': [{
-                'threshold': -4.0,
-                'limit': (-225, -4.0)
+                'threshold': -36.0,
+                'limit': (-200, -36.0)
             },{
-                'threshold': 225.0,
-                'limit': (-4.0, 225)
+                'threshold': 85.0,
+                'limit': (-36, 85.0)
+            },{
+                'threshold': 200.0,
+                'limit': (85.0, 200.0)
             }]
         },
         'MI_CH0_2mA': {
@@ -317,11 +320,14 @@ class CYGHERMESDef:
         },
         'MI_CH0_external': {
             'cali_segment': [{
-                'threshold': -4.5,
-                'limit': (-90.0, -4.5)
+                'threshold':-80,
+                'limit': (-562.5, -80)
             },{
-                'threshold': 90.0,
-                'limit': (-4.5, 90.0)
+                'threshold':60,
+                'limit': (-80, 60)
+            },{
+                'threshold':562.5,
+                'limit': (60, 562.5)
             }]
         },
         'MI_CH1_5uA': {
@@ -338,11 +344,14 @@ class CYGHERMESDef:
         },
         'MI_CH1_200uA': {
             'cali_segment': [{
-                'threshold': -4.0,
-                'limit': (-225, -4.0)
+                'threshold': -36.0,
+                'limit': (-200, -36.0)
             },{
-                'threshold': 225.0,
-                'limit': (-4.0, 225)
+                'threshold': 85.0,
+                'limit': (-36, 85.0)
+            },{
+                'threshold': 200.0,
+                'limit': (85.0, 200.0)
             }]
         },
         'MI_CH1_2mA': {
@@ -380,11 +389,14 @@ class CYGHERMESDef:
         },
         'MI_CH2_200uA': {
             'cali_segment': [{
-                'threshold': -4.0,
-                'limit': (-225, -4.0)
+                'threshold': -36.0,
+                'limit': (-200, -36.0)
             },{
-                'threshold': 225.0,
-                'limit': (-4.0, 225)
+                'threshold': 85.0,
+                'limit': (-36, 85.0)
+            },{
+                'threshold': 200.0,
+                'limit': (85.0, 200.0)
             }]
         },
         'MI_CH2_2mA': {
@@ -422,11 +434,14 @@ class CYGHERMESDef:
         },
         'MI_CH3_200uA': {
             'cali_segment': [{
-                'threshold': -4.0,
-                'limit': (-225, -4.0)
+                'threshold': -36.0,
+                'limit': (-200, -36.0)
             },{
-                'threshold': 225.0,
-                'limit': (-4.0, 225)
+                'threshold': 85.0,
+                'limit': (-36, 85.0)
+            },{
+                'threshold': 200.0,
+                'limit': (85.0, 200.0)
             }]
         },
         'MI_CH3_2mA': {
@@ -449,295 +464,7 @@ class CYGHERMESDef:
                 'threshold':562.5,
                 'limit': (320, 562.5)
             }]
-        },
-        'SINGLE_FI_CH0_5uA': {
-            'cali_segment': [{
-                'threshold': 5.625,
-                'limit': (0, 5.625)
-            }]
-        },
-        'SINGLE_FI_CH0_20uA': {
-            'cali_segment': [{
-                'threshold': 22.5,
-                'limit': (0, 22.5)
-            }]
-        },
-        'SINGLE_FI_CH0_200uA': {
-            'cali_segment': [{
-                'threshold': 225.0,
-                'limit': (0.0, 225.0)
-            }]
-        },
-        'SINGLE_FI_CH0_2mA': {
-            'cali_segment': [{
-                'threshold': 2.25,
-                'limit': (0, 2.25)
-            }]
-        },
-        'SINGLE_FI_CH0_external': {
-            'cali_segment': [{
-                'threshold':90,
-                'limit': (0.0, 90)
-            }]
-        },
-        'SINGLE_MI_CH0_5uA': {
-            'cali_segment': [{
-                'threshold': 5.625,
-                'limit': (-1, 5.625)
-            }]
-        },
-        'SINGLE_MI_CH0_20uA': {
-            'cali_segment': [{
-                'threshold': 22.5,
-                'limit': (-2, 22.5)
-            }]
-        },
-        'SINGLE_MI_CH0_200uA': {
-            'cali_segment': [{
-                'threshold': 225,
-                'limit': (-10, 225)
-            }]
-        },
-        'SINGLE_MI_CH0_2mA': {
-            'cali_segment': [{
-                'threshold': 2.25,
-                'limit': (-0.2, 2.25)
-            }]
-        },
-        'SINGLE_MI_CH0_external': {
-            'cali_segment': [{
-                'threshold': 562.5,
-                'limit': (-30, 562.5)
-            }]
-        },
-        'SINGLE_FI_CH1_5uA': {
-            'cali_segment': [{
-                'threshold': 5.625,
-                'limit': (0, 5.625)
-            }]
-        },
-        'SINGLE_FI_CH1_20uA': {
-            'cali_segment': [{
-                'threshold': 22.5,
-                'limit': (0, 22.5)
-            }]
-        },
-        'SINGLE_FI_CH1_200uA': {
-            'cali_segment': [{
-                'threshold': 225.0,
-                'limit': (0.0, 225.0)
-            }]
-        },
-        'SINGLE_FI_CH1_2mA': {
-            'cali_segment': [{
-                'threshold': 2.25,
-                'limit': (0, 2.25)
-            }]
-        },
-        'SINGLE_FI_CH1_external': {
-            'cali_segment': [{
-                'threshold':90,
-                'limit': (0.0, 90)
-            }]
-        },
-        'SINGLE_MI_CH1_5uA': {
-            'cali_segment': [{
-                'threshold': 5.625,
-                'limit': (-1, 5.625)
-            }]
-        },
-        'SINGLE_MI_CH1_20uA': {
-            'cali_segment': [{
-                'threshold': 22.5,
-                'limit': (-2, 22.5)
-            }]
-        },
-        'SINGLE_MI_CH1_200uA': {
-            'cali_segment': [{
-                'threshold': 225,
-                'limit': (-10, 225)
-            }]
-        },
-        'SINGLE_MI_CH1_2mA': {
-            'cali_segment': [{
-                'threshold': 2.25,
-                'limit': (0, 2.25)
-            }]
-        },
-        'SINGLE_MI_CH1_external': {
-            'cali_segment': [{
-                'threshold': 562.5,
-                'limit': (-30, 562.5)
-            }]
-        },
-        'SINGLE_FI_CH2_5uA': {
-            'cali_segment': [{
-                'threshold': 5.625,
-                'limit': (0, 5.625)
-            }]
-        },
-        'SINGLE_FI_CH2_20uA': {
-            'cali_segment': [{
-                'threshold': 22.5,
-                'limit': (0, 22.5)
-            }]
-        },
-        'SINGLE_FI_CH2_200uA': {
-            'cali_segment': [{
-                'threshold': 225.0,
-                'limit': (0.0, 225.0)
-            }]
-        },
-        'SINGLE_FI_CH2_2mA': {
-            'cali_segment': [{
-                'threshold': 2.25,
-                'limit': (0, 2.25)
-            }]
-        },
-        'SINGLE_FI_CH2_external': {
-            'cali_segment': [{
-                'threshold': 562.5,
-                'limit': (-30, 562.5)
-            }]
-        },
-        'SINGLE_MI_CH2_5uA': {
-            'cali_segment': [{
-                'threshold': 5.625,
-                'limit': (-1, 5.625)
-            }]
-        },
-        'SINGLE_MI_CH2_20uA': {
-            'cali_segment': [{
-                'threshold': 22.5,
-                'limit': (-2, 22.5)
-            }]
-        },
-        'SINGLE_MI_CH2_200uA': {
-            'cali_segment': [{
-                'threshold': 225,
-                'limit': (-10, 225)
-            }]
-        },
-        'SINGLE_MI_CH2_2mA': {
-            'cali_segment': [{
-                'threshold': 2.25,
-                'limit': (-0.2, 2.25)
-            }]
-        },
-        'SINGLE_MI_CH2_external': {
-            'cali_segment': [{
-                'threshold': 562.5,
-                'limit': (-30, 562.5)
-            }]
-        },
-        'SINGLE_FI_CH3_5uA': {
-            'cali_segment': [{
-                'threshold': 5.625,
-                'limit': (0, 5.625)
-            }]
-        },
-        'SINGLE_FI_CH3_20uA': {
-            'cali_segment': [{
-                'threshold': 22.5,
-                'limit': (0, 22.5)
-            }]
-        },
-        'SINGLE_FI_CH3_200uA': {
-            'cali_segment': [{
-                'threshold': 225.0,
-                'limit': (0.0, 225.0)
-            }]
-        },
-        'SINGLE_FI_CH3_2mA': {
-            'cali_segment': [{
-                'threshold': 2.25,
-                'limit': (0, 2.25)
-            }]
-        },
-        'SINGLE_FI_CH3_external': {
-            'cali_segment': [{
-                'threshold': 562.5,
-                'limit': (-30, 562.5)
-            }]
-        },
-        'SINGLE_MI_CH3_5uA': {
-            'cali_segment': [{
-                'threshold': 5.625,
-                'limit': (-1, 5.625)
-            }]
-        },
-        'SINGLE_MI_CH3_20uA': {
-            'cali_segment': [{
-                'threshold': 22.5,
-                'limit': (0, 22.5)
-            }]
-        },
-        'SINGLE_MI_CH3_200uA': {
-            'cali_segment': [{
-                'threshold': 225,
-                'limit': (-10, 225)
-            }]
-        },
-        'SINGLE_MI_CH3_2mA': {
-            'cali_segment': [{
-                'threshold': 2.25,
-                'limit': (-0.2, 2.25)
-            }]
-        },
-        'SINGLE_MI_CH3_external': {
-            'cali_segment': [{
-                'threshold': 562.5,
-                'limit': (-30, 562.5)
-            }]
-        },
-        'SINGLE_FV_CH0': {
-            'cali_segment': [{
-                'threshold': 22500.0,
-                'limit': (0.0, 22500.0)
-            }]
-        },
-        'SINGLE_FV_CH1': {
-            'cali_segment': [{
-                'threshold': 22500.0,
-                'limit': (0.0, 22500.0)
-            }]
-        },
-        'SINGLE_FV_CH2': {
-            'cali_segment': [{
-                'threshold': 22500.0,
-                'limit': (0.0, 22500.0)
-            }]
-        },
-        'SINGLE_FV_CH3': {
-            'cali_segment': [{
-                'threshold': 22500.0,
-                'limit': (0.0, 22500.0)
-            }]
-        },
-        'SINGLE_MV_CH0': {
-            'cali_segment': [{
-                'threshold': 22500.0,
-                'limit': (0.0, 22500.0)
-            }]
-        },
-        'SINGLE_MV_CH1': {
-            'cali_segment': [{
-                'threshold': 22500.0,
-                'limit': (0.0, 22500.0)
-            }]
-        },
-        'SINGLE_MV_CH2': {
-            'cali_segment': [{
-                'threshold': 22500.0,
-                'limit': (0.0, 22500.0)
-            }]
-        },
-        'SINGLE_MV_CH3': {
-            'cali_segment': [{
-                'threshold': 22500.0,
-                'limit': (0.0, 22500.0)
-            }]
-        },
+        }
     }
 
 cyg_hercules_range_table = {
@@ -832,6 +559,10 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
                                    CYGHERMESDef.P_DAC_POWER_ADDR)
             self.mcp4725_N = MCP4725(i2c_dac_and_io,
                                    CYGHERMESDef.N_DAC_POWER_ADDR)
+            self.mcp4725_P_AMP = MCP4725(i2c_eeprom,
+                                   CYGHERMESDef.P_DAC_POWER_ADDR)
+            self.mcp4725_N_AMP = MCP4725(i2c_eeprom,
+                                   CYGHERMESDef.N_DAC_POWER_ADDR)
         else:
             raise ValueError('No valid i2c bus input')
         if isinstance(ipcore, str):
@@ -850,17 +581,13 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         self.ip_control = MIX_SMU_Lite_CYG(self.axi4_bus)
         self.ad5522 = AD5522(self.ip_control, 5000)
         self.ad4134 = MIXAD4134CYG(self.axi4_bus)
-        volt_range = self.set_dac_range()
+        volt_range = self.set_dac_range(-11250)
         self.low_limit = volt_range[0]
         self.high_limit = volt_range[1]
-        
-        if self.low_limit>=CYGHERMESDef.LOW_LIMIT_VOL:
-            self.cal_table = cyg_hercules_range_table
-        else:
-            self.cal_table = cyg_hercules_range_table
+        self.cal_table = cyg_hercules_range_table
         super(CYG_HERMES, self).__init__(self.eeprom,
                                     temperature_device=None,
-                                    channel_table=self.cal_table)
+                                    channel_table=cyg_hercules_range_table)
         hermes_sn_in_bottom = self.eeprom_amp.read(17, 17)
         ascii_str = ''.join(chr(i) for i in hermes_sn_in_bottom)
         hermes_sn = self.read_serial_number()
@@ -894,8 +621,6 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             self.ad5522.set_pmu_control(
                 CYGHERMESDef.AD5522_CHANNEL[channel],
                 CYGHERMESDef.PMU_REG_DEFAULT)
-            self.single_pmu_enable(channel)
-            self.single_pmu_disable(channel)
         self.update_dac_and_pmu_reg()
         return "done"
 
@@ -1303,9 +1028,9 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         self.ad5522.enable_pmu([CYGHERMESDef.AD5522_CHANNEL[channel]])
         curr_range = self.get_single_pmu_curr_range(channel)
         if curr_range == "external":
-            self.set_power_amp_board_relay(channel, 0)
-        else:
             self.set_power_amp_board_relay(channel, 1)
+        else:
+            self.set_power_amp_board_relay(channel, 0)
         return "done"
 
     def single_pmu_disable(self, channel):
@@ -1715,7 +1440,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         else:
             return self.get_alarm_status()
 
-    def set_dut_positive_volt(self, volt):
+    def set_dut_positive_volt(self, volt, volt_amp):
         '''
         Set mcp4725 amp positive voltatge.
 
@@ -1726,12 +1451,17 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         '''
         volt = 8000 if volt < 8000 else volt
         volt = 26000 if volt > 26000 else volt
+        volt_amp = 12000 if volt_amp >= 12000 else volt_amp
+        volt_amp = 4000 if volt_amp <= 4000 else volt_amp
+
         Vmcp_set = (25600 - volt) / 5.0
+        Vamp_set = (12000 - volt_amp) / 2.5
         self.mcp4725_P.output_volt_dc(Vmcp_set)
+        self.mcp4725_P_AMP.output_volt_dc(Vamp_set)
         self.Vmcp4725_Vamp = volt
         return "done"
 
-    def set_dut_negative_volt(self, volt):
+    def set_dut_negative_volt(self, volt, volt_amp):
         '''
         Set mcp4725 amp nagative voltatge.
 
@@ -1742,9 +1472,15 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         '''
         volt = -6000 if volt > -6000 else volt
         volt = -16000 if volt < -16000 else volt
-        
+        volt_amp = -4000 if volt_amp >= -4000 else volt_amp
+        volt_amp = -12000 if volt_amp <= -12000 else volt_amp
+
         Vmcp_set = (5500 + volt) / (-3.33)
+
+        Vamp_set = (3980 + volt_amp) / (-2.5)
+
         self.mcp4725_N.output_volt_dc(Vmcp_set)
+        self.mcp4725_N_AMP.output_volt_dc(Vamp_set)
         self.Vmcp4725_Vamp = volt
         return volt
 
@@ -2068,8 +1804,8 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         Return:
             str, "done"
         '''
-        self.set_dut_negative_volt(-6000)
-        self.set_dut_positive_volt(14000)
+        self.set_dut_negative_volt(-6000, -10000)
+        self.set_dut_positive_volt(14000, 10000)
         coefficient = 3744.9143
         if low_vol == None:
             raw = bytes(self.eeprom.read(CYGHERMESDef.OUTPUT_RANGE_ADDRESS, 4))
@@ -2079,8 +1815,8 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
                 low_vol = struct.unpack('!i', raw)[0]
         if low_vol >= CYGHERMESDef.LOW_LIMIT_VOL:
             low_vol = -1250
-        self.set_dut_negative_volt(low_vol - 2750)
-        self.set_dut_positive_volt(low_vol + 22500 + 2750)
+        self.set_dut_negative_volt(low_vol - 2750, -10000)
+        self.set_dut_positive_volt(low_vol + 22500 + 2750, 10000)
         self.multi_pmu_disable(["ch0", "ch1", "ch2", "ch3"])
         self.base_dac_offset = coefficient * abs(low_vol) / 1000
         self.ad5522.set_dac_offset_value(int(self.base_dac_offset))
@@ -2114,9 +1850,9 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
                                   status_bit)
         curr_range = self.get_single_pmu_curr_range(channel)
         if curr_range == "external":
-            self.set_power_amp_board_relay(channel, 0)
-        else:
             self.set_power_amp_board_relay(channel, 1)
+        else:
+            self.set_power_amp_board_relay(channel, 0)
 
         return "done"
 
@@ -2242,7 +1978,6 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         '''
         for id in range(0, 16):
             self.cat9555_amp.set_pin_dir(id, 0)
-            self.cat9555_amp.set_pin_val(id, 1)
         return "done"
     
     def set_power_amp_board_relay(self, channel, status):
