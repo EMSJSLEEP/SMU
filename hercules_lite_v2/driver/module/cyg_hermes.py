@@ -542,7 +542,8 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         'update_dac_and_pmu_reg', 'control_FV_sequence', 'get_alarm_status',
         'set_multi_pmu_curr_range', 'set_multi_pmu_mode', "set_dut_negative_volt",
         'multi_pmu_disable', "set_dut_positive_volt", 'sequence_set_single_pmu_vol',
-        'reset_power_amp_board_relay', 'set_power_amp_board_relay', 'get_bottom_sn'
+        'reset_power_amp_board_relay', 'set_power_amp_board_relay', 'get_bottom_sn',
+        'set_single_pmu_clamp_vol', 'get_single_pmu_clamp_vol'
     ] + CYGModuleDriver.rpc_public_api + StreamServiceBuffered.streamservice_api
 
     def __init__(self, i2c_eeprom, i2c_dac_and_io, dma=None, ipcore=None):
@@ -1976,8 +1977,10 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         '''
         Reset amp board relay.        
         '''
-        for id in range(0, 16):
-            self.cat9555_amp.set_pin_dir(id, 0)
+        for i in range(0, 4):
+            pin_num = i + 4
+            self.cat9555_amp.set_pin_dir(pin_num, 0)
+            self.cat9555_amp.set_pin_val(pin_num, 0)
         return "done"
     
     def set_power_amp_board_relay(self, channel, status):
@@ -1996,4 +1999,152 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
 
         pin_num = int(channel[2:]) + 4
         self.cat9555_amp.set_pin_val(pin_num, status)
+        return "done"
+
+    def set_single_pmu_clamp_vol(self, channel, clamp_low_volt,
+                                 clamp_high_volt):
+        '''
+        set single pmu's clamp voltage value.
+
+        Args:
+            channel: str, select in ["ch0", "ch1", "ch2", "ch3"]
+            clamp_low_volt:  int
+            clamp_high_volt: int
+        Returns:
+            str, "done"
+
+        Examples:
+            cyg_smu.set_single_pmu_clamp_vol("ch0", 1, 15000)
+        '''
+        assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
+        assert clamp_high_volt - clamp_low_volt >= 500
+        self.select_ad_spi(1)
+
+
+        assert clamp_low_volt < clamp_high_volt
+        code_low_vol = self.base_dac_offset * 0.7777 + (clamp_low_volt /
+                                                        22500.0) * pow(2, 16)
+        code_high_vol = self.base_dac_offset * 0.7777 + (clamp_high_volt /
+                                                         22500.0) * pow(2, 16)
+
+        self.ad5522.set_clamp_vol(CYGHERMESDef.AD5522_CHANNEL[channel],
+                                  int(code_low_vol), int(code_high_vol))
+        
+        v_set = abs(clamp_high_volt) + 2000 if abs(clamp_high_volt) - abs(clamp_low_volt) >= 0 else abs(clamp_low_volt) + 2000
+        Vamp_set = (12000 - v_set) / 2.5
+        self.mcp4725_P_AMP.output_volt_dc(Vamp_set)
+        
+        Vamp_set = (3980 - v_set) / (-2.5)
+        self.mcp4725_N_AMP.output_volt_dc(Vamp_set)
+        return "done"
+
+    def get_single_pmu_clamp_vol(self, channel):
+        '''
+        get single pmu's clamp voltage value.
+
+        Args:
+            channel: str, select in ["ch0", "ch1", "ch2", "ch3"]
+
+        Returns:
+            list, [clamp_low_volt, clamp_high_volt]
+                clamp_low_volt:  int
+                clamp_high_volt: int
+
+        Examples:
+            cyg_smu.get_single_pmu_clamp_vol("ch0")
+        '''
+        assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
+        self.select_ad_spi(1)
+
+        low_code = self.ad5522.read_dac_reg_x_back(
+            CYGHERMESDef.AD5522_CHANNEL[channel], "CLL_Vol")
+        high_code = self.ad5522.read_dac_reg_x_back(
+            CYGHERMESDef.AD5522_CHANNEL[channel], "CLH_Vol")
+
+        clamp_low_volt = (low_code - self.base_dac_offset * 0.7777) / pow(
+            2, 16) * 22500.0
+        clamp_high_volt = (high_code - self.base_dac_offset * 0.7777) / pow(
+            2, 16) * 22500.0
+
+        return [clamp_low_volt, clamp_high_volt]
+
+    def set_single_pmu_clamp_curr(self, channel, clamp_low_curr,
+                                  clamp_high_curr):
+        '''
+        set single pmu's clamp current value.
+
+        Args:
+            channel: str, select in ["ch0", "ch1", "ch2", "ch3"]
+            clamp_low_curr:  float
+            clamp_high_curr: float
+        Returns:
+            str, "done"
+
+        Examples:
+            cyg_smu.set_single_pmu_clamp_vol("ch0", 1, 15000)
+        '''
+        assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
+        self.ad5522.disable_chen([CYGHERMESDef.AD5522_CHANNEL[channel]])
+        self.update_dac_and_pmu_reg()
+        I_range = self.select_range[int(channel[2:])]
+        Rsense = CYGHERMESDef.RSENSE_I_RANGE[I_range]
+        I_range_gear = 1e-3 if Rsense > 500 else 1
+        assert clamp_high_curr - clamp_low_curr >= 0.05 * CYGHERMESDef.RANGE_LIMITS[I_range]
+        code_low_curr = (
+            (clamp_low_curr * I_range_gear * Rsense * 10 * pow(2, 16)) /
+            (4.5 * 5000)) + 32768
+        code_high_curr = (
+            (clamp_high_curr * I_range_gear * Rsense * 10 * pow(2, 16)) /
+            (4.5 * 5000)) + 32768
+        self.select_ad_spi(1)
+        self.ad5522.set_clamp_curr(CYGHERMESDef.AD5522_CHANNEL[channel],
+                                   int(code_low_curr), int(code_high_curr))
+        return "done"
+
+    def get_single_pmu_clamp_curr(self, channel):
+        '''
+        get single pmu's clamp current value.
+
+        Args:
+            channel: str, select in ["ch0", "ch1", "ch2", "ch3"]
+
+        Returns:
+            list, [clamp_low_curr, clamp_high_curr]
+
+        Examples:
+            cyg_smu.get_single_pmu_clamp_curr("ch0")
+        '''
+        assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
+        self.select_ad_spi(1)
+        I_range = self.select_range[int(channel[2:])]
+        Rsense = CYGHERMESDef.RSENSE_I_RANGE[I_range]
+        I_range_gear = 1e3 if Rsense > 500 else 1
+        unit = "uA" if Rsense > 500 else "mA"
+        code_low_curr = self.ad5522.read_dac_reg_x_back(
+            CYGHERMESDef.AD5522_CHANNEL[channel], "CLL_Curr")
+        code_high_curr = self.ad5522.read_dac_reg_x_back(
+            CYGHERMESDef.AD5522_CHANNEL[channel], "CLH_Curr")
+
+        low_curr = ((code_low_curr - 32768) * (4.5 * 5000) /
+                    (Rsense * 10 * pow(2, 16))) * I_range_gear
+        high_curr = ((code_high_curr - 32768) * (4.5 * 5000) /
+                     (Rsense * 10 * pow(2, 16))) * I_range_gear
+        return [low_curr, high_curr, unit]
+
+    def clear_multi_pmu_alarm(self):
+        '''
+       clear alarm status of all PMU channels
+
+       Args:
+            None       
+       Return:
+            str, "done"
+       '''
+        self.select_ad_spi(1)
+        for ch in ["ch0", "ch1", "ch2", "ch3"]:
+            reg = self.ad5522.read_pmu_reg_back(
+                CYGHERMESDef.AD5522_CHANNEL[ch])
+            reg |= 1 << 6
+            self.ad5522.set_pmu_control(CYGHERMESDef.AD5522_CHANNEL[ch],
+                                        reg)
         return "done"
