@@ -1051,12 +1051,13 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         '''
         assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
         self.select_ad_spi(1)
+        self.ad5522.disable_pmu([CYGHERMESDef.AD5522_CHANNEL[channel]])
+        self.update_dac_and_pmu_reg()
         status_bit = self.cat9555.read_output(
             CYGHERMESDef.CAT9555_RELAY_BANK)
         status_bit &= ~(1 << int(channel[2:]))
         self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK,
                                   status_bit)
-        self.ad5522.disable_pmu([CYGHERMESDef.AD5522_CHANNEL[channel]])
 
         return "done"
 
@@ -1180,14 +1181,16 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         '''
         assert isinstance(channel, list)
         self.select_ad_spi(1)
+        self.ad5522.disable_pmu(
+            [CYGHERMESDef.AD5522_CHANNEL[ch] for ch in channel])
+        self.update_dac_and_pmu_reg()
         status_bit = self.cat9555.read_output(
             CYGHERMESDef.CAT9555_RELAY_BANK)
         for ch in channel:
             status_bit &= ~(1 << int(ch[2:]))
         self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK,
                                   status_bit)
-        self.ad5522.disable_pmu(
-            [CYGHERMESDef.AD5522_CHANNEL[ch] for ch in channel])
+
 
         return "done"
 
