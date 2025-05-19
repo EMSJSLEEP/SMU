@@ -543,7 +543,8 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         'set_multi_pmu_curr_range', 'set_multi_pmu_mode', "set_dut_negative_volt",
         'multi_pmu_disable', "set_dut_positive_volt", 'sequence_set_single_pmu_vol',
         'reset_power_amp_board_relay', 'set_power_amp_board_relay', 'get_bottom_sn',
-        'set_single_pmu_clamp_vol', 'get_single_pmu_clamp_vol'
+        'set_single_pmu_clamp_vol', 'get_single_pmu_clamp_vol', 
+        'set_single_pmu_clamp_curr', 'get_single_pmu_clamp_curr'
     ] + CYGModuleDriver.rpc_public_api + StreamServiceBuffered.streamservice_api
 
     def __init__(self, i2c_eeprom, i2c_dac_and_io, dma=None, ipcore=None):
@@ -2086,8 +2087,6 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             cyg_smu.set_single_pmu_clamp_vol("ch0", 1, 15000)
         '''
         assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
-        self.ad5522.disable_chen([CYGHERMESDef.AD5522_CHANNEL[channel]])
-        self.update_dac_and_pmu_reg()
         I_range = self.select_range[int(channel[2:])]
         Rsense = CYGHERMESDef.RSENSE_I_RANGE[I_range]
         I_range_gear = 1e-3 if Rsense > 500 else 1
