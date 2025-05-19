@@ -848,7 +848,10 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         'control_FI_sequence', 'write_module_calibration', 'set_dac_range',
         'update_dac_and_pmu_reg', 'control_FV_sequence', 'get_alarm_status',
         'set_multi_pmu_curr_range', 'set_multi_pmu_mode', "set_dut_negative_volt",
-        'multi_pmu_disable', "set_dut_positive_volt", 'sequence_set_single_pmu_vol'
+        'multi_pmu_disable', "set_dut_positive_volt", 'sequence_set_single_pmu_vol',
+        'set_single_pmu_clamp_vol', 'get_single_pmu_clamp_vol',
+        'set_single_pmu_clamp_curr', 'get_single_pmu_clamp_curr'
+        
     ] + CYGModuleDriver.rpc_public_api + StreamServiceBuffered.streamservice_api
 
     def __init__(self, i2c_eeprom, i2c_dac_and_io, dma=None, ipcore=None):
@@ -923,8 +926,6 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
             self.ad5522.set_pmu_control(
                 CYGHERCULESLITEDef.AD5522_CHANNEL[channel],
                 CYGHERCULESLITEDef.PMU_REG_DEFAULT)
-            self.single_pmu_enable(channel)
-            self.single_pmu_disable(channel)
         self.update_dac_and_pmu_reg()
         return "done"
 
@@ -1325,13 +1326,13 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         '''
         assert channel in CYGHERCULESLITEDef.AD5522_CHANNEL.keys()
         self.select_ad_spi(1)
+        self.ad5522.enable_pmu([CYGHERCULESLITEDef.AD5522_CHANNEL[channel]])
+        self.update_dac_and_pmu_reg()
         status_bit = self.cat9555.read_output(
             CYGHERCULESLITEDef.CAT9555_RELAY_BANK)
         status_bit |= 1 << int(channel[2:])
         self.cat9555.write_output(CYGHERCULESLITEDef.CAT9555_RELAY_BANK,
                                   status_bit)
-        self.ad5522.enable_pmu([CYGHERCULESLITEDef.AD5522_CHANNEL[channel]])
-
         return "done"
 
     def single_pmu_disable(self, channel):
@@ -1349,13 +1350,12 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         '''
         assert channel in CYGHERCULESLITEDef.AD5522_CHANNEL.keys()
         self.select_ad_spi(1)
+        self.ad5522.disable_pmu([CYGHERCULESLITEDef.AD5522_CHANNEL[channel]])
         status_bit = self.cat9555.read_output(
             CYGHERCULESLITEDef.CAT9555_RELAY_BANK)
         status_bit &= ~(1 << int(channel[2:]))
         self.cat9555.write_output(CYGHERCULESLITEDef.CAT9555_RELAY_BANK,
                                   status_bit)
-        self.ad5522.disable_pmu([CYGHERCULESLITEDef.AD5522_CHANNEL[channel]])
-
         return "done"
 
     def set_multi_pmu_mode(self, channel, mode):
@@ -1449,7 +1449,9 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         '''
         assert isinstance(channel, list)
         self.select_ad_spi(1)
-
+        self.ad5522.enable_pmu(
+            [CYGHERCULESLITEDef.AD5522_CHANNEL[ch] for ch in channel])
+        self.update_dac_and_pmu_reg()
         status_bit = self.cat9555.read_output(
             CYGHERCULESLITEDef.CAT9555_RELAY_BANK) & ~(1 << 0 | 1 << 1 | 1 << 2
                                                        | 1 << 3)
@@ -1457,8 +1459,6 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
             status_bit |= 1 << int(ch[2:])
         self.cat9555.write_output(CYGHERCULESLITEDef.CAT9555_RELAY_BANK,
                                   status_bit)
-        self.ad5522.enable_pmu(
-            [CYGHERCULESLITEDef.AD5522_CHANNEL[ch] for ch in channel])
 
         return "done"
 
@@ -1477,14 +1477,15 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         '''
         assert isinstance(channel, list)
         self.select_ad_spi(1)
+        self.ad5522.disable_pmu(
+            [CYGHERCULESLITEDef.AD5522_CHANNEL[ch] for ch in channel])
+        self.update_dac_and_pmu_reg()
         status_bit = self.cat9555.read_output(
             CYGHERCULESLITEDef.CAT9555_RELAY_BANK)
         for ch in channel:
             status_bit &= ~(1 << int(ch[2:]))
         self.cat9555.write_output(CYGHERCULESLITEDef.CAT9555_RELAY_BANK,
                                   status_bit)
-        self.ad5522.disable_pmu(
-            [CYGHERCULESLITEDef.AD5522_CHANNEL[ch] for ch in channel])
 
         return "done"
 
@@ -2256,3 +2257,124 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         data = self.up0.read(size, timeout)
         data_list = [byte for byte in data]
         return data_list
+
+    def set_single_pmu_clamp_vol(self, channel, clamp_low_volt,
+                                 clamp_high_volt):
+        '''
+        set single pmu's clamp voltage value.
+
+        Args:
+            channel: str, select in ["ch0", "ch1", "ch2", "ch3"]
+            clamp_low_volt:  int
+            clamp_high_volt: int
+        Returns:
+            str, "done"
+
+        Examples:
+            cyg_smu.set_single_pmu_clamp_vol("ch0", 1, 15000)
+        '''
+        assert channel in CYGHERCULESLITEDef.AD5522_CHANNEL.keys()
+        assert clamp_high_volt - clamp_low_volt >= 500
+        self.select_ad_spi(1)
+
+
+        assert clamp_low_volt < clamp_high_volt
+        code_low_vol = self.base_dac_offset * 0.7777 + (clamp_low_volt /
+                                                        22500.0) * pow(2, 16)
+        code_high_vol = self.base_dac_offset * 0.7777 + (clamp_high_volt /
+                                                         22500.0) * pow(2, 16)
+
+        self.ad5522.set_clamp_vol(CYGHERCULESLITEDef.AD5522_CHANNEL[channel],
+                                  int(code_low_vol), int(code_high_vol))
+        return "done"
+
+    def get_single_pmu_clamp_vol(self, channel):
+        '''
+        get single pmu's clamp voltage value.
+
+        Args:
+            channel: str, select in ["ch0", "ch1", "ch2", "ch3"]
+
+        Returns:
+            list, [clamp_low_volt, clamp_high_volt]
+                clamp_low_volt:  int
+                clamp_high_volt: int
+
+        Examples:
+            cyg_smu.get_single_pmu_clamp_vol("ch0")
+        '''
+        assert channel in CYGHERCULESLITEDef.AD5522_CHANNEL.keys()
+        self.select_ad_spi(1)
+
+        low_code = self.ad5522.read_dac_reg_x_back(
+            CYGHERCULESLITEDef.AD5522_CHANNEL[channel], "CLL_Vol")
+        high_code = self.ad5522.read_dac_reg_x_back(
+            CYGHERCULESLITEDef.AD5522_CHANNEL[channel], "CLH_Vol")
+
+        clamp_low_volt = (low_code - self.base_dac_offset * 0.7777) / pow(
+            2, 16) * 22500.0
+        clamp_high_volt = (high_code - self.base_dac_offset * 0.7777) / pow(
+            2, 16) * 22500.0
+
+        return [clamp_low_volt, clamp_high_volt]
+
+    def set_single_pmu_clamp_curr(self, channel, clamp_low_curr,
+                                  clamp_high_curr):
+        '''
+        set single pmu's clamp current value.
+
+        Args:
+            channel: str, select in ["ch0", "ch1", "ch2", "ch3"]
+            clamp_low_curr:  float
+            clamp_high_curr: float
+        Returns:
+            str, "done"
+
+        Examples:
+            cyg_smu.set_single_pmu_clamp_curr("ch0", -1, 20)
+        '''
+        assert channel in CYGHERCULESLITEDef.AD5522_CHANNEL.keys()
+        I_range = self.select_range[int(channel[2:])]
+        Rsense = CYGHERCULESLITEDef.RSENSE_I_RANGE[I_range]
+        I_range_gear = 1e-3 if Rsense > 500 else 1
+        assert clamp_high_curr - clamp_low_curr >= 0.05 * CYGHERCULESLITEDef.RANGE_LIMITS[I_range]
+        code_low_curr = (
+            (clamp_low_curr * I_range_gear * Rsense * 10 * pow(2, 16)) /
+            (4.5 * 5000)) + 32768
+        code_high_curr = (
+            (clamp_high_curr * I_range_gear * Rsense * 10 * pow(2, 16)) /
+            (4.5 * 5000)) + 32768
+        self.select_ad_spi(1)
+        self.ad5522.set_clamp_curr(CYGHERCULESLITEDef.AD5522_CHANNEL[channel],
+                                   int(code_low_curr), int(code_high_curr))
+        return "done"
+
+    def get_single_pmu_clamp_curr(self, channel):
+        '''
+        get single pmu's clamp current value.
+
+        Args:
+            channel: str, select in ["ch0", "ch1", "ch2", "ch3"]
+
+        Returns:
+            list, [clamp_low_curr, clamp_high_curr]
+
+        Examples:
+            cyg_smu.get_single_pmu_clamp_curr("ch0")
+        '''
+        assert channel in CYGHERCULESLITEDef.AD5522_CHANNEL.keys()
+        self.select_ad_spi(1)
+        I_range = self.select_range[int(channel[2:])]
+        Rsense = CYGHERCULESLITEDef.RSENSE_I_RANGE[I_range]
+        I_range_gear = 1e3 if Rsense > 500 else 1
+        unit = "uA" if Rsense > 500 else "mA"
+        code_low_curr = self.ad5522.read_dac_reg_x_back(
+            CYGHERCULESLITEDef.AD5522_CHANNEL[channel], "CLL_Curr")
+        code_high_curr = self.ad5522.read_dac_reg_x_back(
+            CYGHERCULESLITEDef.AD5522_CHANNEL[channel], "CLH_Curr")
+
+        low_curr = ((code_low_curr - 32768) * (4.5 * 5000) /
+                    (Rsense * 10 * pow(2, 16))) * I_range_gear
+        high_curr = ((code_high_curr - 32768) * (4.5 * 5000) /
+                     (Rsense * 10 * pow(2, 16))) * I_range_gear
+        return [low_curr, high_curr, unit]
