@@ -10,7 +10,7 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.1'
+__version__ = '0.2'
 
 class CYGHERMESDef:
     LOW_LIMIT_VOL=-1250
