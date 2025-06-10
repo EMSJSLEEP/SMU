@@ -263,38 +263,38 @@ class CYGHERMESDef:
         },
         'MV_CH0': {
             'cali_segment': [{
-                'threshold': 0.0,
-                'limit': (-10000, 0.0)
+                'threshold': 400.0,
+                'limit': (-10000, 400.0)
             },{
                 'threshold': 10000.0,
-                'limit': (0, 10000.0)
+                'limit': (400.0, 10000.0)
             }]
         },
         'MV_CH1': {
             'cali_segment': [{
-                'threshold': 0.0,
-                'limit': (-10000, 0.0)
+                'threshold': 400.0,
+                'limit': (-10000, 400.0)
             },{
                 'threshold': 10000.0,
-                'limit': (0, 10000.0)
+                'limit': (400.0, 10000.0)
             }]
         },
         'MV_CH2': {
             'cali_segment': [{
-                'threshold': 0.0,
-                'limit': (-10000, 0.0)
+                'threshold': 400.0,
+                'limit': (-10000, 400.0)
             },{
                 'threshold': 10000.0,
-                'limit': (0, 10000.0)
+                'limit': (400.0, 10000.0)
             }]
         },
         'MV_CH3': {
             'cali_segment': [{
-                'threshold': 0.0,
-                'limit': (-10000, 0.0)
+                'threshold': 400.0,
+                'limit': (-10000, 400.0)
             },{
                 'threshold': 10000.0,
-                'limit': (0, 10000.0)
+                'limit': (400.0, 10000.0)
             }]
         },
         'MI_CH0_5uA': {
@@ -305,8 +305,11 @@ class CYGHERMESDef:
         },
         'MI_CH0_20uA': {
             'cali_segment': [{
+                'threshold': 0,
+                'limit': (-22.5, 0)
+            },{
                 'threshold': 22.5,
-                'limit': (-22.5, 22.5)
+                'limit': (0, 22.5)
             }]
         },
         'MI_CH0_200uA': {
@@ -323,20 +326,23 @@ class CYGHERMESDef:
         },
         'MI_CH0_2mA': {
             'cali_segment': [{
-                'threshold': 0.0,
-                'limit': (-2.25, 0.0)
+                'threshold': -0.5,
+                'limit': (-2.25, -0.5)
+            },{
+                'threshold': 0.5,
+                'limit': (-0.5, 0.5)
             },{
                 'threshold': 2.25,
-                'limit': (0.0, 2.25)
+                'limit': (0.5, 2.25)
             }]
         },
         'MI_CH0_external': {
             'cali_segment': [{
-                'threshold':-95,
-                'limit': (-562.5, -95)
+                'threshold':-70,
+                'limit': (-562.5, -70)
             },{
                 'threshold':85,
-                'limit': (-95, 85)
+                'limit': (-70, 85)
             },{
                 'threshold':562.5,
                 'limit': (85, 562.5)
@@ -350,8 +356,11 @@ class CYGHERMESDef:
         },
         'MI_CH1_20uA': {
             'cali_segment': [{
+                'threshold': 0,
+                'limit': (-22.5, 0)
+            },{
                 'threshold': 22.5,
-                'limit': (-22.5, 22.5)
+                'limit': (0, 22.5)
             }]
         },
         'MI_CH1_200uA': {
@@ -368,20 +377,23 @@ class CYGHERMESDef:
         },
         'MI_CH1_2mA': {
             'cali_segment': [{
-                'threshold': 0.0,
-                'limit': (-2.25, 0.0)
+                'threshold': -0.5,
+                'limit': (-2.25, -0.5)
+            },{
+                'threshold': 0.5,
+                'limit': (-0.5, 0.5)
             },{
                 'threshold': 2.25,
-                'limit': (0.0, 2.25)
+                'limit': (0.5, 2.25)
             }]
         },
         'MI_CH1_external': {
             'cali_segment': [{
-                'threshold':-95,
-                'limit': (-562.5, -95)
+                'threshold':-70,
+                'limit': (-562.5, -70)
             },{
                 'threshold':85,
-                'limit': (-95, 85)
+                'limit': (-70, 85)
             },{
                 'threshold':562.5,
                 'limit': (85, 562.5)
@@ -395,8 +407,11 @@ class CYGHERMESDef:
         },
         'MI_CH2_20uA': {
             'cali_segment': [{
+                'threshold': 0,
+                'limit': (-22.5, 0)
+            },{
                 'threshold': 22.5,
-                'limit': (-22.5, 22.5)
+                'limit': (0, 22.5)
             }]
         },
         'MI_CH2_200uA': {
@@ -413,20 +428,23 @@ class CYGHERMESDef:
         },
         'MI_CH2_2mA': {
             'cali_segment': [{
-                'threshold': 0.0,
-                'limit': (-2.25, 0.0)
+                'threshold': -0.5,
+                'limit': (-2.25, -0.5)
+            },{
+                'threshold': 0.5,
+                'limit': (-0.5, 0.5)
             },{
                 'threshold': 2.25,
-                'limit': (0.0, 2.25)
+                'limit': (0.5, 2.25)
             }]
         },
         'MI_CH2_external': {
             'cali_segment': [{
-                'threshold':-95,
-                'limit': (-562.5, -95)
+                'threshold':-70,
+                'limit': (-562.5, -70)
             },{
                 'threshold':85,
-                'limit': (-95, 85)
+                'limit': (-70, 85)
             },{
                 'threshold':562.5,
                 'limit': (85, 562.5)
@@ -440,8 +458,11 @@ class CYGHERMESDef:
         },
         'MI_CH3_20uA': {
             'cali_segment': [{
+                'threshold': 0,
+                'limit': (-22.5, 0)
+            },{
                 'threshold': 22.5,
-                'limit': (-22.5, 22.5)
+                'limit': (0, 22.5)
             }]
         },
         'MI_CH3_200uA': {
@@ -458,20 +479,23 @@ class CYGHERMESDef:
         },
         'MI_CH3_2mA': {
             'cali_segment': [{
-                'threshold': 0.0,
-                'limit': (-2.25, 0.0)
+                'threshold': -0.5,
+                'limit': (-2.25, -0.5)
+            },{
+                'threshold': 0.5,
+                'limit': (-0.5, 0.5)
             },{
                 'threshold': 2.25,
-                'limit': (0.0, 2.25)
+                'limit': (0.5, 2.25)
             }]
         },
         'MI_CH3_external': {
             'cali_segment': [{
-                'threshold':-95,
-                'limit': (-562.5, -95)
+                'threshold':-70,
+                'limit': (-562.5, -70)
             },{
                 'threshold':85,
-                'limit': (-95, 85)
+                'limit': (-70, 85)
             },{
                 'threshold':562.5,
                 'limit': (85, 562.5)
@@ -1034,14 +1058,15 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         '''
         assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
         self.select_ad_spi(1)
-        self.ad5522.enable_pmu([CYGHERMESDef.AD5522_CHANNEL[channel]])
-        self.update_dac_and_pmu_reg()
+       
         status_bit = self.cat9555.read_output(
             CYGHERMESDef.CAT9555_RELAY_BANK)
 
         status_bit |= 1 << int(channel[2:])
         self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK,
                                   status_bit)
+        self.ad5522.enable_pmu([CYGHERMESDef.AD5522_CHANNEL[channel]])
+        self.update_dac_and_pmu_reg()
         curr_range = self.get_single_pmu_curr_range(channel)
         if curr_range == "external":
             self.set_power_amp_board_relay(channel, 1)
