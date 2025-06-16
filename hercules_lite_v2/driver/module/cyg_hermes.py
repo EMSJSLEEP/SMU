@@ -10,7 +10,7 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.2'
+__version__ = '0.3'
 
 class CYGHERMESDef:
     LOW_LIMIT_VOL=-1250
@@ -682,13 +682,14 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             INT10K=enable=DUTGND_CH
         '''
         cmd_sys = 0
+        GUARD_EN_BIT = 1 << 8
         gain0_bit = 0 << 6
         gain1_bit = 1 << 7
         INT_10K = 1 << 9
         DUTGND_CH = 1 << 12
         ALARM_BIT = 1 << 10 | 1 << 11
         LATCH_BIT = 1 << 2
-        cmd_sys |= gain0_bit | gain1_bit | AD5522RegDef.PMU_SYSREG_TMPEN | INT_10K | DUTGND_CH | ALARM_BIT | LATCH_BIT
+        cmd_sys |= GUARD_EN_BIT | gain0_bit | gain1_bit | AD5522RegDef.PMU_SYSREG_TMPEN | INT_10K | DUTGND_CH | ALARM_BIT | LATCH_BIT
         self.cat9555.write_dir(CYGHERMESDef.CAT9555_RELAY_BANK, 0x00)
         self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK, 0x00)
         self.cat9555.write_dir(CYGHERMESDef.CAT9555_COMP_BANK, 0x00)
