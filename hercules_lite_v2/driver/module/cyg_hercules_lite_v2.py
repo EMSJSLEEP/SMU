@@ -10,7 +10,7 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.5'
+__version__ = '0.6'
 
 class CYGHERCULESLITEDef:
     LOW_LIMIT_VOL=-1250
@@ -280,26 +280,35 @@ class CYGHERCULESLITEDef:
         },
         'MI_CH0_20uA': {
             'cali_segment': [{
+                'threshold': 0,
+                'limit': (-22.5, 0)
+            },{
                 'threshold': 22.5,
-                'limit': (-22.5, 22.5)
+                'limit': (0, 22.5)
             }]
         },
         'MI_CH0_200uA': {
             'cali_segment': [{
-                'threshold': -4.0,
-                'limit': (-225, -4.0)
+                'threshold': -36.0,
+                'limit': (-200, -36.0)
             },{
-                'threshold': 225.0,
-                'limit': (-4.0, 225)
+                'threshold': 85.0,
+                'limit': (-36, 85.0)
+            },{
+                'threshold': 200.0,
+                'limit': (85.0, 200.0)
             }]
         },
         'MI_CH0_2mA': {
             'cali_segment': [{
-                'threshold': 0.0,
-                'limit': (-2.25, 0.0)
+                'threshold': -0.5,
+                'limit': (-2.25, -0.5)
+            },{
+                'threshold': 0.5,
+                'limit': (-0.5, 0.5)
             },{
                 'threshold': 2.25,
-                'limit': (0.0, 2.25)
+                'limit': (0.5, 2.25)
             }]
         },
         'MI_CH0_external': {
@@ -319,26 +328,35 @@ class CYGHERCULESLITEDef:
         },
         'MI_CH1_20uA': {
             'cali_segment': [{
+                'threshold': 0,
+                'limit': (-22.5, 0)
+            },{
                 'threshold': 22.5,
-                'limit': (-22.5, 22.5)
+                'limit': (0, 22.5)
             }]
         },
         'MI_CH1_200uA': {
             'cali_segment': [{
-                'threshold': -4.0,
-                'limit': (-225, -4.0)
+                'threshold': -36.0,
+                'limit': (-200, -36.0)
             },{
-                'threshold': 225.0,
-                'limit': (-4.0, 225)
+                'threshold': 85.0,
+                'limit': (-36, 85.0)
+            },{
+                'threshold': 200.0,
+                'limit': (85.0, 200.0)
             }]
         },
         'MI_CH1_2mA': {
             'cali_segment': [{
-                'threshold': 0.0,
-                'limit': (-2.25, 0.0)
+                'threshold': -0.5,
+                'limit': (-2.25, -0.5)
+            },{
+                'threshold': 0.5,
+                'limit': (-0.5, 0.5)
             },{
                 'threshold': 2.25,
-                'limit': (0.0, 2.25)
+                'limit': (0.5, 2.25)
             }]
         },
         'MI_CH1_external': {
@@ -358,26 +376,35 @@ class CYGHERCULESLITEDef:
         },
         'MI_CH2_20uA': {
             'cali_segment': [{
+                'threshold': 0,
+                'limit': (-22.5, 0)
+            },{
                 'threshold': 22.5,
-                'limit': (-22.5, 22.5)
+                'limit': (0, 22.5)
             }]
         },
         'MI_CH2_200uA': {
             'cali_segment': [{
-                'threshold': -4.0,
-                'limit': (-225, -4.0)
+                'threshold': -36.0,
+                'limit': (-200, -36.0)
             },{
-                'threshold': 225.0,
-                'limit': (-4.0, 225)
+                'threshold': 85.0,
+                'limit': (-36, 85.0)
+            },{
+                'threshold': 200.0,
+                'limit': (85.0, 200.0)
             }]
         },
         'MI_CH2_2mA': {
             'cali_segment': [{
-                'threshold': 0.0,
-                'limit': (-2.25, 0.0)
+                'threshold': -0.5,
+                'limit': (-2.25, -0.5)
+            },{
+                'threshold': 0.5,
+                'limit': (-0.5, 0.5)
             },{
                 'threshold': 2.25,
-                'limit': (0.0, 2.25)
+                'limit': (0.5, 2.25)
             }]
         },
         'MI_CH2_external': {
@@ -397,26 +424,35 @@ class CYGHERCULESLITEDef:
         },
         'MI_CH3_20uA': {
             'cali_segment': [{
+                'threshold': 0,
+                'limit': (-22.5, 0)
+            },{
                 'threshold': 22.5,
-                'limit': (-22.5, 22.5)
+                'limit': (0, 22.5)
             }]
         },
         'MI_CH3_200uA': {
             'cali_segment': [{
-                'threshold': -4.0,
-                'limit': (-225, -4.0)
+                'threshold': -36.0,
+                'limit': (-200, -36.0)
             },{
-                'threshold': 225.0,
-                'limit': (-4.0, 225)
+                'threshold': 85.0,
+                'limit': (-36, 85.0)
+            },{
+                'threshold': 200.0,
+                'limit': (85.0, 200.0)
             }]
         },
         'MI_CH3_2mA': {
             'cali_segment': [{
-                'threshold': 0.0,
-                'limit': (-2.25, 0.0)
+                'threshold': -0.5,
+                'limit': (-2.25, -0.5)
+            },{
+                'threshold': 0.5,
+                'limit': (-0.5, 0.5)
             },{
                 'threshold': 2.25,
-                'limit': (0.0, 2.25)
+                'limit': (0.5, 2.25)
             }]
         },
         'MI_CH3_external': {
@@ -949,13 +985,13 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
             INT10K=enable=DUTGND_CH
         '''
         cmd_sys = 0
-        GUARD_EN_BIT = 1 << 8
         gain0_bit = 0 << 6
         gain1_bit = 1 << 7
         INT_10K = 1 << 9
         DUTGND_CH = 1 << 12
         ALARM_BIT = 1 << 10 | 1 << 11
         LATCH_BIT = 1 << 2
+        GUARD_EN_BIT = 1 << 8
         cmd_sys |= GUARD_EN_BIT | gain0_bit | gain1_bit | AD5522RegDef.PMU_SYSREG_TMPEN | INT_10K | DUTGND_CH | ALARM_BIT | LATCH_BIT
         self.cat9555.write_dir(CYGHERCULESLITEDef.CAT9555_RELAY_BANK, 0x00)
         self.cat9555.write_output(CYGHERCULESLITEDef.CAT9555_RELAY_BANK, 0x00)
