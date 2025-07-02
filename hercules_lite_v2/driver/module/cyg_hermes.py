@@ -10,7 +10,7 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.3'
+__version__ = '0.5'
 
 class CYGHERMESDef:
     LOW_LIMIT_VOL=-1250
@@ -1097,7 +1097,9 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         status_bit &= ~(1 << int(channel[2:]))
         self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK,
                                   status_bit)
-
+        curr_range = self.get_single_pmu_curr_range(channel)
+        if curr_range == "external":
+            self.set_power_amp_board_relay(channel, 0)
         return "done"
 
     def set_multi_pmu_mode(self, channel, mode):
@@ -1195,14 +1197,15 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             [CYGHERMESDef.AD5522_CHANNEL[ch] for ch in channel])
         self.update_dac_and_pmu_reg()
         status_bit = self.cat9555.read_output(
-            CYGHERMESDef.CAT9555_RELAY_BANK) & ~(1 << 0 | 1 << 1 | 1 << 2
-                                                       | 1 << 3)
+            CYGHERMESDef.CAT9555_RELAY_BANK) & ~(1 << 0 | 1 << 1 | 1 << 2 | 1 << 3)
+        amp_status_bit = self.cat9555_amp.read_output(0)
         for ch in channel:
             status_bit |= 1 << int(ch[2:])
-        self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK,
-                                  status_bit)
-
-
+            curr_range = self.get_single_pmu_curr_range(ch)
+            if curr_range == "external":
+                amp_status_bit |= 1 << (4 + int(ch[2:]))
+        self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK, status_bit)
+        self.cat9555_amp.write_output(0, amp_status_bit)
         return "done"
 
     def multi_pmu_disable(self, channel):
@@ -1223,12 +1226,14 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         self.ad5522.disable_pmu(
             [CYGHERMESDef.AD5522_CHANNEL[ch] for ch in channel])
         self.update_dac_and_pmu_reg()
-        status_bit = self.cat9555.read_output(
-            CYGHERMESDef.CAT9555_RELAY_BANK)
+        status_bit = self.cat9555.read_output(CYGHERMESDef.CAT9555_RELAY_BANK)
+        amp_status_bit = self.cat9555_amp.read_output(0)
         for ch in channel:
             status_bit &= ~(1 << int(ch[2:]))
+            amp_status_bit &= ~(1 << (4 + int(ch[2:]))) 
         self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK,
                                   status_bit)
+        self.cat9555_amp.write_output(0, amp_status_bit)
 
 
         return "done"
