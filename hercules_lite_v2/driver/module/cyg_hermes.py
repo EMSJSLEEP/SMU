@@ -10,7 +10,7 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.5'
+__version__ = '0.5.1'
 
 class CYGHERMESDef:
     LOW_LIMIT_VOL=-1250
@@ -580,7 +580,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         'multi_pmu_disable', "set_dut_positive_volt", 'sequence_set_single_pmu_vol',
         'reset_power_amp_board_relay', 'set_power_amp_board_relay', 'get_bottom_sn',
         'set_single_pmu_clamp_vol', 'get_single_pmu_clamp_vol', 
-        'set_single_pmu_clamp_curr', 'get_single_pmu_clamp_curr'
+        'set_single_pmu_clamp_curr', 'get_single_pmu_clamp_curr', 'set_adc_sample_rate'
     ] + CYGModuleDriver.rpc_public_api + StreamServiceBuffered.streamservice_api
 
     def __init__(self, i2c_eeprom, i2c_dac_and_io, dma=None, ipcore=None):
@@ -1059,15 +1059,15 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         '''
         assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
         self.select_ad_spi(1)
-       
+        self.ad5522.enable_pmu([CYGHERMESDef.AD5522_CHANNEL[channel]])
+        self.update_dac_and_pmu_reg()
         status_bit = self.cat9555.read_output(
             CYGHERMESDef.CAT9555_RELAY_BANK)
 
         status_bit |= 1 << int(channel[2:])
         self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK,
                                   status_bit)
-        self.ad5522.enable_pmu([CYGHERMESDef.AD5522_CHANNEL[channel]])
-        self.update_dac_and_pmu_reg()
+
         curr_range = self.get_single_pmu_curr_range(channel)
         if curr_range == "external":
             self.set_power_amp_board_relay(channel, 1)
@@ -1787,7 +1787,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             self.set_single_pmu_mode(ch, "FV")
             self.set_single_pmu_vol(ch, 0)
             self.single_pmu_enable(ch)
-            self.update_dac_and_pmu_reg()
+            self.set_power_amp_board_relay(ch)
         self.ip_control.enable_loop_func(is_loop)
         if is_loop:
             count = 1
@@ -1828,6 +1828,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             self.set_single_pmu_curr_range(ch, "external")
             self.set_single_pmu_mode(ch, "FI")
             self.hercules_enable_relay(ch)
+            self.set_power_amp_board_relay(ch)
             self.update_dac_and_pmu_reg()
 
         self.ip_control.enable_loop_func(is_loop)
@@ -2195,4 +2196,16 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             reg |= 1 << 6
             self.ad5522.set_pmu_control(CYGHERMESDef.AD5522_CHANNEL[ch],
                                         reg)
+        return "done"
+    
+    def set_adc_sample_rate(self, rate):
+        '''
+        Set adc sample rate
+
+        Args:
+            rate: int, unit ksps
+        '''
+        self.select_ad_spi(0)
+        self.ad4134.set_ad4134_odr(rate)
+        time.sleep(0.5)
         return "done"
