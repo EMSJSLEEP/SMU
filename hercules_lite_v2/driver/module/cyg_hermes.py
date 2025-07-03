@@ -1827,9 +1827,10 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         for ch in channel_list:
             self.set_single_pmu_curr_range(ch, "external")
             self.set_single_pmu_mode(ch, "FI")
+            self.set_single_pmu_curr(ch, 0)
             self.hercules_enable_relay(ch)
-            self.set_power_amp_board_relay(ch)
-            self.update_dac_and_pmu_reg()
+            self.set_power_amp_board_relay(ch, 1)
+            self.single_pmu_enable(ch)
 
         self.ip_control.enable_loop_func(is_loop)
         if is_loop:
