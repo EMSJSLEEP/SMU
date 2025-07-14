@@ -531,7 +531,7 @@ class AD5522(object):
         I_range_base = ((I_range_base + curr_range) << 16) | AD5522RegDef.PMU_MODE_DATAREG
         dac_code = 0 if dac_code < 0 else dac_code
         dac_code = 65535 if dac_code > 65535 else dac_code
-        self.spi_ad5522.write_cmd_list(channel | I_range_base | dac_code, 1, continue_time)
+        self.spi_ad5522.write_cmd_list(channel | I_range_base | dac_code, 0, continue_time)
 
         return 'done'
 
