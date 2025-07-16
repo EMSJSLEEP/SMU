@@ -10,7 +10,7 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.5.2'
+__version__ = '0.5.3'
 
 class CYGHERMESDef:
     LOW_LIMIT_VOL=-1250
@@ -563,7 +563,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         "reset", "get_driver_version", "power_on_init", "select_ad_spi",
         "set_single_comp_cap", "get_single_comp_cap", "set_single_pmu_mode",
         "get_single_pmu_mode", "set_single_pmu_vol", "get_single_pmu_vol",
-        "set_single_pmu_curr_range", "get_single_pmu_curr_range",
+        "set_single_pmu_curr_range", "get_single_pmu_curr_range", "set_hiz_mode",
         "enable_cmd_list", "set_single_pmu_curr", 'get_single_pmu_curr',
         'multi_pmu_enable', "control_loop", 'sequence_set_single_pmu_curr',
         'sequence_enable_single_pmu', 'get_dac_range', 'set_single_pmu_meas_mode',
@@ -650,10 +650,14 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         '''
         reset ad5522, ad4134, mcp4725 and cat9555.
         '''
+        self.reset_power_amp_board_relay()
+        self.cat9555.write_dir(CYGHERMESDef.CAT9555_RELAY_BANK, 0x00)
+        self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK, 0x00)
+        self.cat9555.write_dir(CYGHERMESDef.CAT9555_COMP_BANK, 0x00)
+        self.cat9555.write_output(CYGHERMESDef.CAT9555_COMP_BANK, 0x00)
         self.ip_control.reset()
         time.sleep(0.002)
         self.power_on_init()
-        self.reset_power_amp_board_relay()
         for channel in ["ch0", "ch1", "ch2", "ch3"]:
             self.set_single_comp_cap(channel, "default")
             self.ad5522.set_pmu_control(
@@ -661,6 +665,26 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
                 CYGHERMESDef.PMU_REG_DEFAULT)
         self.update_dac_and_pmu_reg()
         return "done"
+
+    def set_hiz_mode(self, channel, mode):
+        '''
+        set hermes to curr HIZ mode or vol HIZ mode.
+        
+        Args:
+            mode, str, [curr, vol]
+        '''
+        assert mode in ["FV", "FI"]
+        assert channel in ["ch0", "ch1", "ch2", "ch3"]
+        w_data = 0
+        if mode == "FV":
+            w_data = CYGHERMESDef.PMU_REG_DEFAULT
+        else:
+            w_data = CYGHERMESDef.PMU_REG_DEFAULT | 1 << 19
+        self.ad5522.set_pmu_control(
+                CYGHERMESDef.AD5522_CHANNEL[channel], w_data)
+        self.update_dac_and_pmu_reg()
+        return "done"
+        
 
     def select_ad_spi(self, choice):
         '''
@@ -690,10 +714,6 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         ALARM_BIT = 1 << 10 | 1 << 11
         LATCH_BIT = 1 << 2
         cmd_sys |= GUARD_EN_BIT | gain0_bit | gain1_bit | AD5522RegDef.PMU_SYSREG_TMPEN | INT_10K | DUTGND_CH | ALARM_BIT | LATCH_BIT
-        self.cat9555.write_dir(CYGHERMESDef.CAT9555_RELAY_BANK, 0x00)
-        self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK, 0x00)
-        self.cat9555.write_dir(CYGHERMESDef.CAT9555_COMP_BANK, 0x00)
-        self.cat9555.write_output(CYGHERMESDef.CAT9555_COMP_BANK, 0x00)
         self.select_range = ["2mA", "2mA", "2mA", "2mA"]
         self.reset_ad4134()
         self.select_ad_spi(1)
@@ -1060,19 +1080,21 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
         self.select_ad_spi(1)
         self.ad5522.enable_pmu([CYGHERMESDef.AD5522_CHANNEL[channel]])
-        self.update_dac_and_pmu_reg()
+        
+        curr_range = self.get_single_pmu_curr_range(channel)
+        if curr_range == "external":
+            self.set_power_amp_board_relay(channel, 1)
+        else:
+            self.set_power_amp_board_relay(channel, 0)
+            
         status_bit = self.cat9555.read_output(
             CYGHERMESDef.CAT9555_RELAY_BANK)
 
         status_bit |= 1 << int(channel[2:])
         self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK,
                                   status_bit)
-
-        curr_range = self.get_single_pmu_curr_range(channel)
-        if curr_range == "external":
-            self.set_power_amp_board_relay(channel, 1)
-        else:
-            self.set_power_amp_board_relay(channel, 0)
+        self.update_dac_and_pmu_reg()
+        
         return "done"
 
     def single_pmu_disable(self, channel):
@@ -1091,7 +1113,6 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
         self.select_ad_spi(1)
         self.ad5522.disable_pmu([CYGHERMESDef.AD5522_CHANNEL[channel]])
-        self.update_dac_and_pmu_reg()
         status_bit = self.cat9555.read_output(
             CYGHERMESDef.CAT9555_RELAY_BANK)
         status_bit &= ~(1 << int(channel[2:]))
@@ -1100,6 +1121,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         curr_range = self.get_single_pmu_curr_range(channel)
         if curr_range == "external":
             self.set_power_amp_board_relay(channel, 0)
+        self.update_dac_and_pmu_reg()
         return "done"
 
     def set_multi_pmu_mode(self, channel, mode):
@@ -1195,7 +1217,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         self.select_ad_spi(1)
         self.ad5522.enable_pmu(
             [CYGHERMESDef.AD5522_CHANNEL[ch] for ch in channel])
-        self.update_dac_and_pmu_reg()
+        
         status_bit = self.cat9555.read_output(
             CYGHERMESDef.CAT9555_RELAY_BANK) & ~(1 << 0 | 1 << 1 | 1 << 2 | 1 << 3)
         amp_status_bit = self.cat9555_amp.read_output(0)
@@ -1204,8 +1226,10 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             curr_range = self.get_single_pmu_curr_range(ch)
             if curr_range == "external":
                 amp_status_bit |= 1 << (4 + int(ch[2:]))
-        self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK, status_bit)
         self.cat9555_amp.write_output(0, amp_status_bit)
+        self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK, status_bit)
+        
+        self.update_dac_and_pmu_reg()
         return "done"
 
     def multi_pmu_disable(self, channel):
@@ -1225,7 +1249,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         self.select_ad_spi(1)
         self.ad5522.disable_pmu(
             [CYGHERMESDef.AD5522_CHANNEL[ch] for ch in channel])
-        self.update_dac_and_pmu_reg()
+        
         status_bit = self.cat9555.read_output(CYGHERMESDef.CAT9555_RELAY_BANK)
         amp_status_bit = self.cat9555_amp.read_output(0)
         for ch in channel:
@@ -1234,8 +1258,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK,
                                   status_bit)
         self.cat9555_amp.write_output(0, amp_status_bit)
-
-
+        self.update_dac_and_pmu_reg()
         return "done"
 
     def set_sys_meas_out_gain(self, gain0, gain1):
@@ -1736,7 +1759,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         if I_range in CYGHERMESDef.RANGE_LIMITS.keys():
             set_curr = min(curr, CYGHERMESDef.RANGE_LIMITS[I_range])
         dac_code = (set_curr * I_range_gear * Rsense * 10 * pow(2, 16)) / (4.5 * 5000) + 32768
-        self.ad5522.sequence_set_output_curr(CYGHERMESDef.AD5522_CHANNEL[channel], int(dac_code), 0)
+        self.ad5522.sequence_set_output_curr(CYGHERMESDef.AD5522_CHANNEL[channel], int(dac_code), 0, 0)
         self.ad5522.sequence_enable_pmu(CYGHERMESDef.AD5522_CHANNEL[channel], continue_time)
         return "done"
 
@@ -1770,7 +1793,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
                 if I_range in CYGHERMESDef.RANGE_LIMITS.keys():
                     set_curr = min(curr, CYGHERMESDef.RANGE_LIMITS[I_range])
                 dac_code = (set_curr * I_range_gear * Rsense * 10 * pow(2, 16)) / (4.5 * 5000) + 32768
-                self.ad5522.sequence_set_output_curr(CYGHERMESDef.AD5522_CHANNEL[channel], int(dac_code), 0)
+                self.ad5522.sequence_set_output_curr(CYGHERMESDef.AD5522_CHANNEL[channel], int(dac_code), 0, 0)
             self.ad5522.sequence_enable_pmu(CYGHERMESDef.AD5522_CHANNEL[channel], continue_time)
             return "done"
 
