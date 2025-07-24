@@ -1723,8 +1723,7 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         alarm_reg_dict = {}
         reg_data = self.ad5522.read_alarm_reg_back() >> 4
         alarm_reg_dict = {
-            name: (reg_data >> _pos) & 0x01
-            for _pos, name in enumerate(CYGHERCULESLITEDef.PMU_ALARM_REG_DEF)
+            name: (reg_data >> _pos) & 0x01 for _pos, name in enumerate(CYGHERCULESLITEDef.PMU_ALARM_REG_DEF)
         }
         return alarm_reg_dict
 
