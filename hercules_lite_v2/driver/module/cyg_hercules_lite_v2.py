@@ -10,7 +10,7 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.6'
+__version__ = '0.7'
 
 class CYGHERCULESLITEDef:
     LOW_LIMIT_VOL=-1250
@@ -877,7 +877,7 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         'clear_multi_pmu_alarm',  'sequence_disable_single_pmu','reset_ad4134',
         'get_single_pmu_meas_mode', 'single_pmu_enable', 'pre_thread_launch',
         'single_pmu_disable', 'set_sys_meas_out_gain', 'get_sys_meas_out_gain',
-        "read_all_control_reg", 'set_sys_thermal_shutdown_temp', 'open_stream', 
+        "read_all_control_reg", 'set_sys_thermal_shutdown_temp', 'open_stream', 'set_measure_wire_mode',
         'get_sys_thermal_shutdown_temp', 'get_register_data', 'post_thread_shutdown',
         'get_multi_meas_result', 'set_register_data', 'get_single_meas_result',
         'set_multi_pmu_meas_mode', 'hercules_enable_relay', 'streaming_read',
@@ -885,7 +885,7 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         'update_dac_and_pmu_reg', 'control_FV_sequence', 'get_alarm_status',
         'set_multi_pmu_curr_range', 'set_multi_pmu_mode', "set_dut_negative_volt",
         'multi_pmu_disable', "set_dut_positive_volt", 'sequence_set_single_pmu_vol',
-        'set_single_pmu_clamp_vol', 'get_single_pmu_clamp_vol',
+        'set_single_pmu_clamp_vol', 'get_single_pmu_clamp_vol', 'set_hiz_mode',
         'set_single_pmu_clamp_curr', 'get_single_pmu_clamp_curr'
         
     ] + CYGModuleDriver.rpc_public_api + StreamServiceBuffered.streamservice_api
@@ -1005,6 +1005,47 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         self.update_dac_and_pmu_reg()
         self.set_calibration_mode("cal")
         return "done"
+
+    def set_hiz_mode(self, channel, mode):
+        '''
+        set hermes to curr HIZ mode or vol HIZ mode.
+        
+        Args:
+            mode, str, [curr, vol]
+        '''
+        assert mode in ["FV", "FI"]
+        assert channel in ["ch0", "ch1", "ch2", "ch3"]
+        w_data = 0
+        if mode == "FV":
+            w_data = CYGHERCULESLITEDef.PMU_REG_DEFAULT
+        else:
+            w_data = CYGHERCULESLITEDef.PMU_REG_DEFAULT | 1 << 19
+        self.ad5522.set_pmu_control(
+                CYGHERCULESLITEDef.AD5522_CHANNEL[channel], w_data)
+        self.update_dac_and_pmu_reg()
+        return "done"
+    
+    def set_measure_wire_mode(self, wire_mode):
+        '''
+        2-wire or 4-wire to measure.
+        Arg:
+            wire_mode: string, ["2_wire", "4_wire"]
+        Return:
+            "done"
+        '''
+        cmd_sys = 0
+        GUARD_EN_BIT = 1 << 8
+        gain0_bit = 0 << 6
+        gain1_bit = 1 << 7
+        INT_10K = 1 << 9
+        DUTGND_CH = 1 << 12
+        ALARM_BIT = 1 << 10 | 1 << 11
+        LATCH_BIT = 1 << 2
+        cmd_sys |= GUARD_EN_BIT | gain0_bit | gain1_bit | AD5522RegDef.PMU_SYSREG_TMPEN  | DUTGND_CH | ALARM_BIT | LATCH_BIT
+        if wire_mode == "2_wire":
+            cmd_sys |= INT_10K
+        self.ad5522.set_system_control(cmd_sys)
+        self.update_dac_and_pmu_reg()
 
     def reset_ad4134(self):
         self.select_ad_spi(0)
