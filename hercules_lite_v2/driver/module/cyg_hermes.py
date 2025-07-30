@@ -574,7 +574,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         'get_sys_thermal_shutdown_temp', 'get_register_data', 'post_thread_shutdown',
         'get_multi_meas_result', 'set_register_data', 'get_single_meas_result',
         'set_multi_pmu_meas_mode', 'hercules_enable_relay', 'streaming_read',
-        'control_FI_sequence', 'write_module_calibration', 'set_dac_range',
+        'control_FI_sequence', 'write_module_calibration', 'set_dac_range', 'set_measure_wire_mode',
         'update_dac_and_pmu_reg', 'control_FV_sequence', 'get_alarm_status', 'control_FV_sequence_sync',
         'set_multi_pmu_curr_range', 'set_multi_pmu_mode', "set_dut_negative_volt",
         'multi_pmu_disable', "set_dut_positive_volt", 'sequence_set_single_pmu_vol',
@@ -721,6 +721,28 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         self.ad5522.set_dac_offset_value(int(self.base_dac_offset))
         self.update_dac_and_pmu_reg()
         return "done"
+
+    def set_measure_wire_mode(self, wire_mode):
+        '''
+        2-wire or 4-wire to measure.
+        Arg:
+            wire_mode: string, ["2_wire", "4_wire"]
+        Return:
+            "done"
+        '''
+        cmd_sys = 0
+        GUARD_EN_BIT = 1 << 8
+        gain0_bit = 0 << 6
+        gain1_bit = 1 << 7
+        INT_10K = 1 << 9
+        DUTGND_CH = 1 << 12
+        ALARM_BIT = 1 << 10 | 1 << 11
+        LATCH_BIT = 1 << 2
+        cmd_sys |= GUARD_EN_BIT | gain0_bit | gain1_bit | AD5522RegDef.PMU_SYSREG_TMPEN  | DUTGND_CH | ALARM_BIT | LATCH_BIT
+        if wire_mode == "2_wire":
+            cmd_sys |= INT_10K
+        self.ad5522.set_system_control(cmd_sys)
+        self.update_dac_and_pmu_reg()
 
     def reset_ad4134(self):
         self.select_ad_spi(0)
@@ -1080,7 +1102,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
         self.select_ad_spi(1)
         self.ad5522.enable_pmu([CYGHERMESDef.AD5522_CHANNEL[channel]])
-        
+        self.update_dac_and_pmu_reg()
         curr_range = self.get_single_pmu_curr_range(channel)
         if curr_range == "external":
             self.set_power_amp_board_relay(channel, 1)
@@ -1093,7 +1115,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         status_bit |= 1 << int(channel[2:])
         self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK,
                                   status_bit)
-        self.update_dac_and_pmu_reg()
+        
         
         return "done"
 
