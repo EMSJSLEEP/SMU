@@ -14,7 +14,7 @@ __version__ = '0.5.4'
 
 class CYGHERMESDef:
     LOW_LIMIT_VOL=-1250
-    DMA_MAX_READ_SIZE = 16
+    DMA_MAX_READ_SIZE = 150000 * 4
     DMA_TIME_OUT = 1
     BASE_CLOCK_TIME = 1.0 / 125e6
     EEPROM_DEV_ADDR = 0x20
@@ -1899,6 +1899,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
                     ch, 0,
                     int(125 *
                         (channel_change_time_list[num] - 9.4 + raise_time2)))
+        self.ad4134.control_datalogger(1) 
         if (self.ip_control.get_cmd_list_send_status() == 0):
             self.ip_control.enable_cmd_list_send(is_loop)
         else:
@@ -1943,49 +1944,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         for i in range(count):
             self.sequence_set_multi_pmu_vol(channel_list, vol_list, int(125 * (continue_time - 9.4 + raise_time1)))
             self.sequence_set_multi_pmu_vol(channel_list, end_vol_list, int(125 * (channel_change_time - 9.4 + raise_time2)))
-        if (self.ip_control.get_cmd_list_send_status() == 0):
-            self.ip_control.enable_cmd_list_send(is_loop)
-        else:
-            raise CYGHERMESException("Please wait for while")
-        return "done"
-
-    def control_FI_sequence_sync(self, channel_list, curr_list, continue_time, channel_change_time, raise_time1, raise_time2, is_loop, count):
-        '''
-        Control channels output different current by set time。
-
-        Args:
-            channel_list: list, ["ch0", "ch1", "ch2", "ch3"]
-            curr_list: list, [1000, 2000, 3000, 4000]
-            continue_time_list: [35, 35, 35, 35]
-            channel_change_time_list: [10, 10, 10, 10]
-            raise_time1: 0
-            raise_time1: 2
-            is_loop: bool, assert in ['False', 'True']
-            count: 1
-        Return:
-            "done"
-        '''
-        start_curr = 0
-        end_curr_list = []
-        for num, ch in enumerate(channel_list):
-            if curr_list[num] < 0 :
-                start_curr = -0.5
-                end_curr_list.append(0.5)
-            else:
-                start_curr = 0.5
-                end_curr_list.append(-0.5)
-            self.set_single_pmu_curr_range(ch, "external")
-            self.set_single_pmu_mode(ch, "FI")
-            self.set_single_pmu_curr(ch, start_curr)
-            self.single_pmu_enable(ch)
-        self.ip_control.enable_loop_func(is_loop)
-        if is_loop:
-            count = 1
-        for num in range(count):
-            self.sequence_set_multi_pmu_curr(
-                channel_list, curr_list, int(125 * (continue_time - 9.4 + raise_time1)))
-            self.sequence_set_multi_pmu_curr(
-                channel_list, end_curr_list, int(125 * (channel_change_time - 9.4 + raise_time2)))
+        self.ad4134.control_datalogger(1) 
         if (self.ip_control.get_cmd_list_send_status() == 0):
             self.ip_control.enable_cmd_list_send(is_loop)
         else:
@@ -2032,6 +1991,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
                     ch, curr_list[num], int(125 * (continue_time_list[num] - 9.4 + raise_time1)))
                 self.sequence_set_single_pmu_curr(
                     ch, end_curr, int(125 * (channel_change_time_list[num] - 9.4 + raise_time2)))
+        self.ad4134.control_datalogger(1) 
         if (self.ip_control.get_cmd_list_send_status() == 0):
             self.ip_control.enable_cmd_list_send(is_loop)
         else:
@@ -2075,6 +2035,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
                 channel_list, curr_list, int(125 * (continue_time - 9.4 + raise_time1)))
             self.sequence_set_multi_pmu_curr(
                 channel_list, end_curr_list, int(125 * (channel_change_time - 9.4 + raise_time2)))
+        self.ad4134.control_datalogger(1) 
         if (self.ip_control.get_cmd_list_send_status() == 0):
             self.ip_control.enable_cmd_list_send(is_loop)
         else:
