@@ -10,11 +10,11 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.7'
+__version__ = '0.7.1'
 
 class CYGHERCULESLITEDef:
     LOW_LIMIT_VOL=-1250
-    DMA_MAX_READ_SIZE = 16
+    DMA_MAX_READ_SIZE = 150000 * 4
     DMA_TIME_OUT = 1
     BASE_CLOCK_TIME = 1.0 / 125e6
     EEPROM_DEV_ADDR = 0x20
@@ -2120,6 +2120,7 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
                     ch, 0,
                     int(125 *
                         (channel_change_time_list[num] - 9.4 + raise_time2)))
+        self.ad4134.control_datalogger(1) 
         if (self.ip_control.get_cmd_list_send_status() == 0):
             self.ip_control.enable_cmd_list_send(is_loop)
         else:
@@ -2159,6 +2160,7 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
                     ch, curr_list[num], int(125 * (continue_time_list[num] - 9.4 + raise_time1)))
                 self.sequence_disable_single_pmu(
                     ch, int(125 * (channel_change_time_list[num] - 9.4 + raise_time2)))
+        self.ad4134.control_datalogger(1) 
         if (self.ip_control.get_cmd_list_send_status() == 0):
             self.ip_control.enable_cmd_list_send(is_loop)
         else:
