@@ -1,5 +1,7 @@
 from mix.driver.core.bus.axi4_lite_bus import AXI4LiteBus
 
+__version__ = '0.2'
+
 class AD5522RegDef:
     PMU_REG_RD = 0x01 << 28
 
