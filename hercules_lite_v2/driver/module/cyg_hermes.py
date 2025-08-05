@@ -1884,7 +1884,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             self.set_single_pmu_mode(ch, "FV")
             self.set_single_pmu_vol(ch, 0)
             self.single_pmu_enable(ch)
-            self.set_power_amp_board_relay(ch, 1)
+            self.update_dac_and_pmu_reg()
         self.ip_control.enable_loop_func(is_loop)
         if is_loop:
             count = 1
@@ -1934,6 +1934,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             self.set_single_pmu_mode(ch, "FV")
             self.set_single_pmu_vol(ch, 0)
             self.single_pmu_enable(ch)
+            self.update_dac_and_pmu_reg()
             end_vol_list.append(0)
 
         self.ip_control.enable_loop_func(is_loop)
@@ -1980,6 +1981,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             self.set_single_pmu_mode(ch, "FI")
             self.set_single_pmu_curr(ch, start_curr)
             self.single_pmu_enable(ch)
+            self.update_dac_and_pmu_reg()
         self.ip_control.enable_loop_func(is_loop)
         if is_loop:
             count = 1
@@ -2025,6 +2027,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             self.set_single_pmu_mode(ch, "FI")
             self.set_single_pmu_curr(ch, start_curr)
             self.single_pmu_enable(ch)
+            self.update_dac_and_pmu_reg()
         self.ip_control.enable_loop_func(is_loop)
         if is_loop:
             count = 1
