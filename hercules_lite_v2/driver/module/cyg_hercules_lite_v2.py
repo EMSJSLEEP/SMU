@@ -10,7 +10,7 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 class CYGHERCULESLITEDef:
     LOW_LIMIT_VOL=-1250
@@ -2060,7 +2060,7 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
  
         self.ad5522.sequence_set_output_curr(
             CYGHERCULESLITEDef.AD5522_CHANNEL[channel], int(dac_code),
-            0)
+            0, 0)
         self.ad5522.sequence_enable_pmu(
             CYGHERCULESLITEDef.AD5522_CHANNEL[channel], continue_time)
         return "done"
