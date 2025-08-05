@@ -886,7 +886,8 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         'set_multi_pmu_curr_range', 'set_multi_pmu_mode', "set_dut_negative_volt",
         'multi_pmu_disable', "set_dut_positive_volt", 'sequence_set_single_pmu_vol',
         'set_single_pmu_clamp_vol', 'get_single_pmu_clamp_vol', 'set_hiz_mode',
-        'set_single_pmu_clamp_curr', 'get_single_pmu_clamp_curr'
+        'set_single_pmu_clamp_curr', 'get_single_pmu_clamp_curr', 'set_adc_sample_rate',
+        'control_FI_sequence_sync', 'control_FV_sequence_sync'
         
     ] + CYGModuleDriver.rpc_public_api + StreamServiceBuffered.streamservice_api
 
@@ -2001,6 +2002,31 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         self.ip_control.write_cmd_list(_convert_cmd, 1, continue_time)
         return "done"
 
+    def sequence_set_multi_pmu_vol(self, channel_list, vol_list, continue_time):
+            '''
+            set single pmu's voltage value, -10000 ~ 10000 mV.
+
+            Args:
+                channel: str, select in ["ch0", "ch1", "ch2", "ch3"]
+                vol:  int, -10000 ~ 10000 mV, step 10mV
+            Returns:
+                str, "done"
+
+            Examples:
+                cyg_smu.set_single_pmu_vol("ch0", 10)
+            '''
+            self.select_ad_spi(1)
+            dac_code = 0
+            self.set_sys_meas_out_gain(0, 1)
+            for num, channel in enumerate(channel_list):
+                vol = self.calibrate(f"FV_{channel.upper()}", vol_list[num])
+                dac_code = self.base_dac_offset * 0.7777 + (vol / 22500.0) * pow(2, 16)
+                _convert_cmd = 1 << (24 + int(channel[2:])) | int(
+                    dac_code) | 0x0D << 16 | 0x03 << 22
+                self.ip_control.write_cmd_list(_convert_cmd, 0, continue_time)
+            self.ad5522.sequence_enable_pmu(CYGHERCULESLITEDef.AD5522_CHANNEL[channel], continue_time)
+            return "done"
+
     def sequence_set_single_pmu_curr(self, channel, curr, continue_time):
         '''
         set single pmu's current value.
@@ -2030,15 +2056,48 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
 
         if I_range in CYGHERCULESLITEDef.RANGE_LIMITS.keys():
             set_curr = min(curr, CYGHERCULESLITEDef.RANGE_LIMITS[I_range])
-        dac_code = (set_curr * I_range_gear * Rsense * 10 *
-                    pow(2, 16)) / (4.5 * 5000) + 32768
-
+        dac_code = (set_curr * I_range_gear * Rsense * 10 * pow(2, 16)) / (4.5 * 5000) + 32768
+ 
         self.ad5522.sequence_set_output_curr(
             CYGHERCULESLITEDef.AD5522_CHANNEL[channel], int(dac_code),
             0)
         self.ad5522.sequence_enable_pmu(
             CYGHERCULESLITEDef.AD5522_CHANNEL[channel], continue_time)
         return "done"
+
+    def sequence_set_multi_pmu_curr(self, channel_list, curr_list, continue_time):
+            '''
+            set multi pmu's current value.
+
+            Args:
+                channel_list: str, select in ["ch0", "ch1", "ch2", "ch3"]
+                curr_list: int,
+                        0 ~ 80 mA for ch0, ch1, ch2, ch3 in external mode.
+                        Step by 0.1uA for 5uA, 20uA, 200uA.
+                        Step by 0.1mA for 2mA, external
+
+            Returns:
+                str, "done"
+
+            Examples:
+                cyg_smu.sequence_set_multi_pmu_curr("ch0", 10)
+            '''
+            self.select_ad_spi(1)
+            set_curr = 0
+            self.set_sys_meas_out_gain(0, 1)
+            for num, channel in enumerate(channel_list):
+                I_range = self.select_range[int(channel[2:])]
+                cal_item = f"FI_{channel.upper()}_{I_range}"
+                Rsense = CYGHERCULESLITEDef.RSENSE_I_RANGE[I_range]
+                curr = self.calibrate(cal_item, curr_list[num])
+                I_range_gear = 1e-3 if Rsense > 500 else 1
+
+                if I_range in CYGHERCULESLITEDef.RANGE_LIMITS.keys():
+                    set_curr = min(curr, CYGHERCULESLITEDef.RANGE_LIMITS[I_range])
+                dac_code = (set_curr * I_range_gear * Rsense * 10 * pow(2, 16)) / (4.5 * 5000) + 32768
+                self.ad5522.sequence_set_output_curr(CYGHERCULESLITEDef.AD5522_CHANNEL[channel], int(dac_code), 0, 0)
+            self.ad5522.sequence_enable_pmu(CYGHERCULESLITEDef.AD5522_CHANNEL[channel], continue_time)
+            return "done"
 
     def sequence_disable_single_pmu(self, channel, channel_change_time):
         '''
@@ -2107,7 +2166,7 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
             self.set_single_pmu_mode(ch, "FV")
             self.set_single_pmu_vol(ch, 0)
             self.single_pmu_enable(ch)
-            self.update_dac_and_pmu_reg()
+        self.update_dac_and_pmu_reg()
         self.ip_control.enable_loop_func(is_loop)
         if is_loop:
             count = 1
@@ -2127,6 +2186,51 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
             raise CYGHERCULESLITEException("Please wait for while")
         return "done"
 
+    def control_FV_sequence_sync(self,
+                                channel_list,
+                                vol_list,
+                                continue_time,
+                                channel_change_time,
+                                raise_time1,
+                                raise_time2,
+                                is_loop,
+                                count):
+            '''
+            Control channels output different voltage by set time。
+
+            Args:
+                channel_list: list, ["ch0", "ch1", "ch2", "ch3"]
+                vol_list: list, [1000, 2000, 3000, 4000]
+                continue_time: us
+                channel_change_time: us
+                raise_time1: 0
+                raise_time1: 2
+                is_loop: bool, assert in ['False', 'True']
+                count: 1
+            Return:
+                "done"
+            '''
+            end_vol_list = []
+            for ch in channel_list:
+                self.set_single_pmu_curr_range(ch, "external")
+                self.set_single_pmu_mode(ch, "FV")
+                self.set_single_pmu_vol(ch, 0)
+                self.single_pmu_enable(ch)
+                end_vol_list.append(0)
+            self.update_dac_and_pmu_reg()
+            self.ip_control.enable_loop_func(is_loop)
+            if is_loop:
+                count = 1
+            for i in range(count):
+                self.sequence_set_multi_pmu_vol(channel_list, vol_list, int(125 * (continue_time - 9.4 + raise_time1)))
+                self.sequence_set_multi_pmu_vol(channel_list, end_vol_list, int(125 * (channel_change_time - 9.4 + raise_time2)))
+            self.ad4134.control_datalogger(1) 
+            if (self.ip_control.get_cmd_list_send_status() == 0):
+                self.ip_control.enable_cmd_list_send(is_loop)
+            else:
+                raise CYGHERCULESLITEException("Please wait for while")
+            return "done"
+
     def control_FI_sequence(self, channel_list, curr_list, continue_time_list,
                             channel_change_time_list, raise_time1, raise_time2,
                             is_loop, count):
@@ -2145,12 +2249,17 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         Return:
             "done"
         '''
-        for ch in channel_list:
+        start_curr = 0
+        for num, ch in enumerate(channel_list):
+            if curr_list[num] < 0 :
+                start_curr = -0.5
+            else:
+                start_curr = 0.5
             self.set_single_pmu_curr_range(ch, "external")
             self.set_single_pmu_mode(ch, "FI")
-            self.hercules_enable_relay(ch)
-            self.update_dac_and_pmu_reg()
-
+            self.set_single_pmu_curr(ch, start_curr)
+            self.single_pmu_enable(ch)
+        self.update_dac_and_pmu_reg()
         self.ip_control.enable_loop_func(is_loop)
         if is_loop:
             count = 1
@@ -2160,6 +2269,50 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
                     ch, curr_list[num], int(125 * (continue_time_list[num] - 9.4 + raise_time1)))
                 self.sequence_disable_single_pmu(
                     ch, int(125 * (channel_change_time_list[num] - 9.4 + raise_time2)))
+        self.ad4134.control_datalogger(1) 
+        if (self.ip_control.get_cmd_list_send_status() == 0):
+            self.ip_control.enable_cmd_list_send(is_loop)
+        else:
+            raise CYGHERCULESLITEException("Please wait for while")
+        return "done"
+
+    def control_FI_sequence_sync(self, channel_list, curr_list, continue_time, channel_change_time, raise_time1, raise_time2, is_loop, count):
+        '''
+        Control channels output different current by set time。
+
+        Args:
+            channel_list: list, ["ch0", "ch1", "ch2", "ch3"]
+            curr_list: list, [1000, 2000, 3000, 4000]
+            continue_time_list: [35, 35, 35, 35]
+            channel_change_time_list: [10, 10, 10, 10]
+            raise_time1: 0
+            raise_time1: 2
+            is_loop: bool, assert in ['False', 'True']
+            count: 1
+        Return:
+            "done"
+        '''
+        start_curr = 0
+        end_curr_list = []
+        for num, ch in enumerate(channel_list):
+            if curr_list[num] < 0 :
+                start_curr = -0.5
+                end_curr_list.append(0.5)
+            else:
+                start_curr = 0.5
+                end_curr_list.append(-0.5)
+            self.set_single_pmu_curr_range(ch, "external")
+            self.set_single_pmu_mode(ch, "FI")
+            self.set_single_pmu_curr(ch, start_curr)
+            self.single_pmu_enable(ch)
+        self.ip_control.enable_loop_func(is_loop)
+        if is_loop:
+            count = 1
+        for num in range(count):
+            self.sequence_set_multi_pmu_curr(
+                channel_list, curr_list, int(125 * (continue_time - 9.4 + raise_time1)))
+            self.sequence_set_multi_pmu_curr(
+                channel_list, end_curr_list, int(125 * (channel_change_time - 9.4 + raise_time2)))
         self.ad4134.control_datalogger(1) 
         if (self.ip_control.get_cmd_list_send_status() == 0):
             self.ip_control.enable_cmd_list_send(is_loop)
@@ -2460,3 +2613,15 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         high_curr = ((code_high_curr - 32768) * (4.5 * 5000) /
                      (Rsense * 10 * pow(2, 16))) * I_range_gear
         return [low_curr, high_curr, unit]
+
+    def set_adc_sample_rate(self, rate):
+        '''
+        Set adc sample rate
+
+        Args:
+            rate: int, unit ksps
+        '''
+        self.select_ad_spi(0)
+        self.ad4134.set_ad4134_odr(rate)
+        time.sleep(0.5)
+        return "done"
