@@ -1358,7 +1358,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
 
         return CYGHERMESDef.TEMP_RANGE[temp_code]
 
-    def get_single_meas_result(self, channel, mean_num=10, retry_times=5):
+    def get_single_meas_result(self, channel, mean_num=10, time_out_s=5):
         '''
         Get measured result of one channel.
 
@@ -1369,10 +1369,10 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
 
         '''
         meas_result = self.get_multi_meas_result([channel], mean_num,
-                                                 retry_times)
+                                                 time_out_s)
         return meas_result
 
-    def get_multi_meas_result(self, channel_list, mean_num=10, retry_times=5):
+    def get_multi_meas_result(self, channel_list, mean_num=10, time_out_s=5):
         '''
             Get measured result of one channel.
 
@@ -1390,8 +1390,8 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
             int) and mean_num > 0, 'average number should greater than 0'
         meas_result = {}
         self.select_ad_spi(0)
-        for _ in range(retry_times):
-            mv_result = self.ad4134.measure(channel_list, mean_num, 5)
+        for _ in range(3):
+            mv_result = self.ad4134.measure(channel_list, mean_num, time_out_s)
             mv_result = {
                 channel: mv_result[int(channel[2:])] for channel in channel_list
             }
