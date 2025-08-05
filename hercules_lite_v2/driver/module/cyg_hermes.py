@@ -10,7 +10,7 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.5.4'
+__version__ = '0.5.5'
 
 class CYGHERMESDef:
     LOW_LIMIT_VOL=-1250
@@ -1102,7 +1102,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
         self.select_ad_spi(1)
         self.ad5522.enable_pmu([CYGHERMESDef.AD5522_CHANNEL[channel]])
-        self.update_dac_and_pmu_reg()
+        
         curr_range = self.get_single_pmu_curr_range(channel)
         if curr_range == "external":
             self.set_power_amp_board_relay(channel, 1)
@@ -1115,8 +1115,6 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         status_bit |= 1 << int(channel[2:])
         self.cat9555.write_output(CYGHERMESDef.CAT9555_RELAY_BANK,
                                   status_bit)
-        
-        
         return "done"
 
     def single_pmu_disable(self, channel):
