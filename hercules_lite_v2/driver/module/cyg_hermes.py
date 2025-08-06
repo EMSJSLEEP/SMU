@@ -10,7 +10,7 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.5.5'
+__version__ = '0.6'
 
 class CYGHERMESDef:
     LOW_LIMIT_VOL=-1250
@@ -2267,8 +2267,6 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         assert channel in CYGHERMESDef.AD5522_CHANNEL.keys()
         assert clamp_high_volt - clamp_low_volt >= 500
         self.select_ad_spi(1)
-
-
         assert clamp_low_volt < clamp_high_volt
         code_low_vol = self.base_dac_offset * 0.7777 + (clamp_low_volt /
                                                         22500.0) * pow(2, 16)
@@ -2280,9 +2278,13 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         
         v_set = abs(clamp_high_volt) + 2000 if abs(clamp_high_volt) - abs(clamp_low_volt) >= 0 else abs(clamp_low_volt) + 2000
         Vamp_set = (12000 - v_set) / 2.5
+        if Vamp_set >= 3300:
+            Vamp_set = 3300
         self.mcp4725_P_AMP.output_volt_dc(Vamp_set)
         
         Vamp_set = (3980 - v_set) / (-2.5)
+        if Vamp_set <= 0:
+            Vamp_set = 0
         self.mcp4725_N_AMP.output_volt_dc(Vamp_set)
         return "done"
 
