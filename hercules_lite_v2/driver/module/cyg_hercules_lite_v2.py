@@ -1412,8 +1412,6 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
                                   status_bit)
         time.sleep(0.001)
         self.ad5522.enable_pmu([CYGHERCULESLITEDef.AD5522_CHANNEL[channel]])
-        self.update_dac_and_pmu_reg()
-
         return "done"
 
     def single_pmu_disable(self, channel):
@@ -2305,6 +2303,7 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
             self.set_single_pmu_mode(ch, "FI")
             self.set_single_pmu_curr(ch, start_curr)
             self.single_pmu_enable(ch)
+            self.update_dac_and_pmu_reg()
         self.ip_control.enable_loop_func(is_loop)
         if is_loop:
             count = 1
