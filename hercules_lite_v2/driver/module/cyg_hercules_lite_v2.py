@@ -10,7 +10,7 @@ from mix.driver.cyg.common.ipcore.mix_smu_lite_cyg import MIX_SMU_Lite_CYG
 import struct
 import time
 
-__version__ = '0.7.2'
+__version__ = '0.8'
 
 class CYGHERCULESLITEDef:
     LOW_LIMIT_VOL=-1250
@@ -870,7 +870,7 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         "reset", "get_driver_version", "power_on_init", "select_ad_spi",
         "set_single_comp_cap", "get_single_comp_cap", "set_single_pmu_mode",
         "get_single_pmu_mode", "set_single_pmu_vol", "get_single_pmu_vol",
-        "set_single_pmu_curr_range", "get_single_pmu_curr_range",
+        "set_single_pmu_curr_range", "get_single_pmu_curr_range", "ip_reset",
         "enable_cmd_list", "set_single_pmu_curr", 'get_single_pmu_curr',
         'multi_pmu_enable', "control_loop", 'sequence_set_single_pmu_curr',
         'sequence_enable_single_pmu', 'get_dac_range', 'set_single_pmu_meas_mode',
@@ -951,6 +951,10 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
     def get_driver_version(self):
         return __version__
 
+    def ip_reset(self):
+        self.ip_control.reset()
+        return "done"
+    
     def reset(self):
         '''
         reset ad5522, ad7768, mcp4725 and cat9555.
@@ -970,7 +974,7 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         '''
         Select spi bus to control ad5522 or ad7768.
         Args:
-            choice: int, select in [0, 1], "0" means choose ad7768.
+            choice: int, select in [0, 1], "0" means choose ad4134.
         Return:
             "done"
         '''
@@ -1051,7 +1055,7 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
     def reset_ad4134(self):
         self.select_ad_spi(0)
         self.ad4134.reset()
-        time.sleep(0.5)
+        time.sleep(0.05)
         self.ad4134.set_data_frame(2)
         self.ad4134.set_ip_channel_format(2)
         self.ad4134.set_channels_packet_config(2, 0, 1, 0)
@@ -1059,7 +1063,6 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         self.ad4134.set_ad4134_power_mode("fast")
         self.ad4134.set_transfer_mode('all')
         self.ad4134.set_ad4134_parallel_output()
-        time.sleep(0.2)
         self.ad4134.set_ad4134_odr(1)
 
     def set_single_comp_cap(self, channel, cap_type):
@@ -2622,5 +2625,5 @@ class CYG_HERCULES_LITE_V2(CYGModuleDriver, StreamServiceBuffered):
         '''
         self.select_ad_spi(0)
         self.ad4134.set_ad4134_odr(rate)
-        time.sleep(0.5)
+        time.sleep(0.05)
         return "done"

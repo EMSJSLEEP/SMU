@@ -3,7 +3,7 @@ from mix.driver.core.bus.axi4_lite_bus import AXI4LiteBus
 import time
 
 __author__ = 'daining.chen@cygia.com'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 class MIXHERCULESIPREGDEF:
@@ -34,7 +34,7 @@ class MIX_SMU_Lite_CYG(object):
     rpc_public_api = [
         'get_ip_time', 'enable_choose_spi', 'get_spi_status',
         'ad5522_spi_write', 'ad5522_spi_read', 'enable_cmd_list_send',
-        'get_cmd_list_send_status','enable_loop_func'
+        'get_cmd_list_send_status','enable_loop_func', 'reset'
     ]
 
     def __init__(self, axi4_bus):
