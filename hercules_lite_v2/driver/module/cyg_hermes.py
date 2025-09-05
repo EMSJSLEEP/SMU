@@ -573,7 +573,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         "read_all_control_reg", 'set_sys_thermal_shutdown_temp', 'open_stream', 
         'get_sys_thermal_shutdown_temp', 'get_register_data', 'post_thread_shutdown',
         'get_multi_meas_result', 'set_register_data', 'get_single_meas_result',
-        'set_multi_pmu_meas_mode', 'hercules_enable_relay', 'streaming_read',
+        'set_multi_pmu_meas_mode', 'hercules_enable_relay', 'streaming_read', 'ip_reset',
         'control_FI_sequence', 'write_module_calibration', 'set_dac_range', 'set_measure_wire_mode',
         'update_dac_and_pmu_reg', 'control_FV_sequence', 'get_alarm_status', 'control_FV_sequence_sync',
         'set_multi_pmu_curr_range', 'set_multi_pmu_mode', "set_dut_negative_volt",
@@ -645,6 +645,10 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         bottom_sn = self.eeprom_amp.read(0, 16)
         ascii_str = ''.join(chr(i) for i in bottom_sn)
         return ascii_str
+
+    def ip_reset(self):
+        self.ip_control.reset()
+        return 0;
 
     def reset(self):
         '''
@@ -747,7 +751,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
     def reset_ad4134(self):
         self.select_ad_spi(0)
         self.ad4134.reset()
-        time.sleep(0.5)
+        time.sleep(0.02)
         self.ad4134.set_data_frame(2)
         self.ad4134.set_ip_channel_format(2)
         self.ad4134.set_channels_packet_config(2, 0, 1, 0)
@@ -755,7 +759,7 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         self.ad4134.set_ad4134_power_mode("fast")
         self.ad4134.set_transfer_mode('all')
         self.ad4134.set_ad4134_parallel_output()
-        time.sleep(0.2)
+        time.sleep(0.02)
         self.ad4134.set_ad4134_odr(1)
 
     def set_single_comp_cap(self, channel, cap_type):
@@ -2406,5 +2410,5 @@ class CYG_HERMES(CYGModuleDriver, StreamServiceBuffered):
         '''
         self.select_ad_spi(0)
         self.ad4134.set_ad4134_odr(rate)
-        time.sleep(0.5)
+        time.sleep(0.05)
         return "done"
